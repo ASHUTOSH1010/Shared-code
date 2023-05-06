@@ -1,0 +1,26 @@
+import numpy as np
+
+# Create a 4x4 array with green and amber values
+arr = np.array([['green', 'amber', 'green', 'amber'],
+                ['amber', 'amber', 'green', 'green'],
+                ['green', 'green', 'amber', 'amber'],
+                ['amber', 'amber', 'green', 'green']])
+
+n_simulations = 5
+simulations = np.empty((n_simulations, *arr.shape))
+
+for i in range(n_simulations):
+    # Set a different random seed before each simulation
+    np.random.seed(i)
+    
+    sim_arr = np.zeros_like(arr, dtype=int)
+    for col_idx in range(arr.shape[1]):
+        column = arr[:, col_idx]
+        green_mask = column == 'green'
+        amber_mask = column == 'amber'
+        sim_arr[green_mask, col_idx] = np.random.choice([0, 1], size=green_mask.sum(), p=[0.85, 0.15])
+        sim_arr[amber_mask, col_idx] = np.random.choice([0, 1], size=amber_mask.sum(), p=[0.7, 0.3])
+    
+    simulations[i] = sim_arr
+
+print(simulations)
