@@ -1,15 +1,30 @@
 import numpy as np
-import pandas as pd
 
-df = pd.DataFrame(np.random.choice(['green', 'amber'], size=(4, 4)))
+# Example 10x10 array representing default status (0 or 1)
+default_array = np.array([
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    [0, 0, 1, 1, 0, 1, 0, 1, 1, 0],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 0, 1, 1, 0, 1, 0, 1],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 1, 0, 1, 0, 0, 1, 0],
+    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
+    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
+])
 
-num_sims = 5
-result_list = []
-for i in range(num_sims):
-    np.random.seed(i) # set seed for each simulation
-    result = df.apply(lambda col: np.where((col == 'green') & (np.random.rand(*col.shape) < 0.85) | 
-                                           (col == 'amber') & (np.random.rand(*col.shape) < 0.7), 0, 1))
-    result_list.append(result.values)
+# Calculate the number of defaults in the last five years for each property
+defaults_last_five_years = np.sum(default_array[:, -5:], axis=1)
 
-result_array = np.stack(result_list, axis=0)
-print(result_array)
+# Identify properties with 3 or more defaults in the last five years
+uninsurable_properties = np.where(defaults_last_five_years >= 3)[0]
+
+# Create a new array to mark uninsurable properties for the next five years
+insurability_array = np.ones_like(default_array, dtype=bool)
+for property_index in uninsurable_properties:
+    insurability_array[property_index, -5:] = False
+
+# Print the insurability array
+print(insurability_array)
+
