@@ -57,4 +57,38 @@ for year in range(defaults_previous_three_years.shape[1]):
 # Print the insurability array
 print(insurability_array)
 
+##############££££££££££££££££££££££££
+
+
+
+import numpy as np
+
+# Example 3D array of size (20, 44, 30) representing default status (0 or 1) for 20 simulations
+# with 44 properties over 30 years
+default_array = np.random.randint(0, 2, size=(20, 44, 30))
+
+# Create an empty array to store the results
+defaults_previous_three_years = np.zeros_like(default_array)
+
+# Iterate over each simulation
+for simulation in range(default_array.shape[0]):
+    # Iterate over each year
+    for year in range(default_array.shape[2]):
+        # Calculate the number of defaults in the previous three years for each property
+        defaults_previous_three_years[:, :, year] = np.sum(default_array[:, :, max(0, year-2):year+1], axis=2)
+
+# Create a new array to mark uninsurable properties for the next two years
+insurability_array = np.ones_like(default_array, dtype=bool)
+
+# Check if a property has defaulted at least two times in the previous three years at each year for each simulation
+for simulation in range(defaults_previous_three_years.shape[0]):
+    for year in range(defaults_previous_three_years.shape[2]):
+        properties_to_uninsure = np.where(defaults_previous_three_years[simulation, :, year] >= 2)[0]
+        for property_index in properties_to_uninsure:
+            insurability_array[simulation, property_index, year+1:year+3] = False
+
+# Print the insurability array for the first simulation
+print(insurability_array[0])
+
+
 
