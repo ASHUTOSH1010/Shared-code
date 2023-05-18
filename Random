@@ -25,6 +25,36 @@ insurability_array = np.ones_like(default_array, dtype=bool)
 for property_index in uninsurable_properties:
     insurability_array[property_index, -5:] = False
 
+
+import numpy as np
+
+# Example 5x5 array representing default status (0 or 1)
+default_array = np.array([
+    [1, 0, 1, 0, 1],
+    [0, 0, 1, 1, 0],
+    [1, 0, 1, 0, 1],
+    [0, 1, 0, 0, 1],
+    [1, 0, 1, 0, 1]
+])
+
+# Create an empty array to store the results
+defaults_previous_three_years = np.zeros_like(default_array)
+
+# Iterate over each year
+for year in range(default_array.shape[1]):
+    # Calculate the number of defaults in the previous three years for each property
+    defaults_previous_three_years[:, year] = np.sum(default_array[:, max(0, year-2):year+1], axis=1)
+
+# Create a new array to mark uninsurable properties for the next two years
+insurability_array = np.ones_like(default_array, dtype=bool)
+
+# Check if a property has defaulted at least two times in the previous three years at each year
+for year in range(defaults_previous_three_years.shape[1]):
+    properties_to_uninsure = np.where(defaults_previous_three_years[:, year] >= 2)[0]
+    for property_index in properties_to_uninsure:
+        insurability_array[property_index, year+1:year+3] = False
+
 # Print the insurability array
 print(insurability_array)
+
 
