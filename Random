@@ -89,6 +89,50 @@ for simulation in range(defaults_previous_three_years.shape[0]):
 
 # Print the insurability array for the first simulation
 print(insurability_array[0])
+-------
+
+import numpy as np
+
+# Input array representing LTV and DTI ratios
+input_array = np.array([
+    [0, 0, 1, 0, 0],
+    [0, 1, 0, 1, 0],
+    [0, 0, 0, 0, 0],
+    [1, 0, 1, 0, 0],
+    [0, 0, 0, 1, 1]
+])
+
+# Custom ranges for LTV and DTI ratios
+ltv_ranges = [(0, 10), (10, 25), (25, 40), (40, 60), (60, 100)]
+dti_ranges = [(0, 15), (15, 30), (30, 45), (45, 60), (60, 100)]
+
+# Read LTV and DTI values from user
+ltv_value = float(input("Enter the LTV value: "))
+dti_value = float(input("Enter the DTI value: "))
+
+# Find the index of the LTV and DTI bands
+ltv_index = -1
+dti_index = -1
+
+for i, (start, end) in enumerate(ltv_ranges):
+    if ltv_value >= start and ltv_value < end:
+        ltv_index = i
+        break
+
+for i, (start, end) in enumerate(dti_ranges):
+    if dti_value >= start and dti_value < end:
+        dti_index = i
+        break
+
+# Check if the LTV and DTI values result in default or not
+if ltv_index != -1 and dti_index != -1:
+    if input_array[ltv_index][dti_index] == 1:
+        print("Default occurred for the given LTV and DTI values.")
+    else:
+        print("No default occurred for the given LTV and DTI values.")
+else:
+    print("Invalid LTV or DTI value. Please enter values within the valid range.")
+
 
 
 
