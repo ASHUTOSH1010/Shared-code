@@ -132,6 +132,55 @@ if ltv_index != -1 and dti_index != -1:
         print("No default occurred for the given LTV and DTI values.")
 else:
     print("Invalid LTV or DTI value. Please enter values within the valid range.")
+--------#######£######
+
+
+
+import numpy as np
+
+# 3D array of LTV ratios (simulations, properties, timesteps)
+ltv_array = np.random.random((20, 44, 30))
+
+# 2D array of properties and DTI bands (properties, 1)
+dti_array = np.random.choice(['low', 'medium', 'high'], size=(44, 1))
+
+# Lookup table of default values based on LTV bands and DTI bands
+lookup_table = np.random.randint(0, 2, size=(5, 3))
+
+# Number of LTV bands
+num_ltv_bands = 5
+
+# Get the dimensions of the arrays
+num_simulations, num_properties, num_timesteps = ltv_array.shape
+
+# Create a result array with the same dimensions as ltv_array
+result_array = np.zeros_like(ltv_array)
+
+# Divide the LTV range into equal bands
+ltv_band_range = np.linspace(0.01, 1.0, num_ltv_bands + 1)
+
+# Iterate over each simulation, property, and timestep
+for sim in range(num_simulations):
+    for prop in range(num_properties):
+        for timestep in range(num_timesteps):
+            # Get the LTV value for the current property and timestep
+            ltv_value = ltv_array[sim, prop, timestep]
+
+            # Get the DTI band for the current property
+            dti_band = dti_array[prop, 0]
+
+            # Find the LTV band index for the current LTV value
+            ltv_band_index = np.searchsorted(ltv_band_range, ltv_value, side='right') - 1
+
+            # Get the default value from the lookup table based on LTV band and DTI band
+            default_value = lookup_table[ltv_band_index, dti_band]
+
+            # Assign the default value to the result array
+            result_array[sim, prop, timestep] = default_value
+
+# Print the result array
+print(result_array)
+
 
 
 
