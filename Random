@@ -9,7 +9,7 @@ default_array = np.array([
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
     [0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 0, 1, 0],
+    [0, ],
     [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
     [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
 ])
@@ -180,6 +180,30 @@ for sim in range(num_simulations):
 
 # Print the result array
 print(result_array)
+
+£££££££££££££££_£
+
+import numpy as np
+from random import randint
+
+def give_insurance(array, year):
+  num_properties = array.shape[1]
+  num_eligible_properties = np.count_nonzero(array[:, :, year] == 0)
+  num_properties_to_insure = min(num_eligible_properties, array.shape[2])
+
+  indices = np.random.choice(num_properties, num_properties_to_insure, replace=False)
+  for index in indices:
+    array[index, year] = 1
+
+def main():
+  array = np.random.randint(0, 2, (50, 10, 10))
+  years = array.shape[2]
+  for year in range(years):
+    give_insurance(array, year)
+  print(array)
+
+if __name__ == "__main__":
+  main()
 
 
 
