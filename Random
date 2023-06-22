@@ -184,26 +184,45 @@ print(result_array)
 £££££££££££££££_£
 
 import numpy as np
-from random import randint
 
-def give_insurance(array, year):
-  num_properties = array.shape[1]
-  num_eligible_properties = np.count_nonzero(array[:, :, year] == 0)
-  num_properties_to_insure = min(num_eligible_properties, array.shape[2])
+# Example array with dimensions (no. of simulation, property, year)
+simulation_property_year = np.array([
+    # Simulation 1
+    [
+        [0, 0, 0],  # Property 1, years 1, 2, 3
+        [0, 0, 0],  # Property 2, years 1, 2, 3
+        [0, 0, 0]   # Property 3, years 1, 2, 3
+    ],
+    # Simulation 2
+    [
+        [0, 0, 0],  # Property 1, years 1, 2, 3
+        [0, 0, 0],  # Property 2, years 1, 2, 3
+        [0, 0, 0]   # Property 3, years 1, 2, 3
+    ]
+])
 
-  indices = np.random.choice(num_properties, num_properties_to_insure, replace=False)
-  for index in indices:
-    array[index, year] = 1
+# Calculate the number of properties
+num_properties = simulation_property_year.shape[1]
 
-def main():
-  array = np.random.randint(0, 2, (50, 10, 10))
-  years = array.shape[2]
-  for year in range(years):
-    give_insurance(array, year)
-  print(array)
+# Iterate over each year in each simulation
+for simulation in simulation_property_year:
+    for year in simulation.T:
+        # Count the number of eligible properties
+        num_eligible = np.sum(year == 0)
 
-if __name__ == "__main__":
-  main()
+        # Calculate the number of properties to insure
+        num_to_insure = int(num_eligible * 0.98)
+
+        # Randomly select properties to make uninsurable
+        uninsurable_indices = np.random.choice(
+            np.where(year == 0)[0], size=num_eligible - num_to_insure, replace=False
+        )
+
+        # Set the selected properties as uninsurable (1)
+        year[uninsurable_indices] = 1
+
+# Print the final 3D array
+print(simulation_property_year)
 
 
 
