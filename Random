@@ -1,4 +1,38 @@
+import pandas as pd
 
+# Create an empty DataFrame to store the pivot table results
+pivot_df = pd.DataFrame()
+
+# Iterate over the columns in output_df
+for column in output_df.columns:
+    if column.endswith('_band'):
+        # Extract the year and return period from the column name
+        year, return_period = column.split('_')[0], column.split('_')[1]
+        
+        # Group the DataFrame by the current column and calculate the sum of 'balance' and average of 'LTV'
+        group_results = output_df.groupby(column).agg({'balance': 'sum', 'LTV': 'mean'})
+        
+        # Reset the index of group_results
+        group_results = group_results.reset_index()
+        
+        # Add 'Year' and 'Return Period' columns to group_results
+        group_results['Year'] = year
+        group_results['Return Period'] = return_period
+        
+        # Reorder the columns
+        group_results = group_results[['Year', 'Return Period', column, 'balance', 'LTV']]
+        
+        # Append group_results to pivot_df
+        pivot_df = pivot_df.append(group_results)
+
+# Sort pivot_df by 'Year', 'Return Period', and the column name
+pivot_df = pivot_df.sort_values(by=['Year', 'Return Period', column])
+
+# Reset the index of pivot_df
+pivot_df = pivot_df.reset_index(drop=True)
+
+# Export pivot_df to a CSV file
+pivot_df.to_csv('output.csv', index=False)
 import pandas as pd
 
 def divide_into_bands(df, column):
