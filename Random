@@ -1,3 +1,52 @@
+
+import pandas as pd
+
+def divide_into_bands(df, column):
+    bands = []
+    for value in df[column]:
+        if value <= 5:
+            band = "0-5%"
+        elif value <= 10:
+            band = "6-10%"
+        elif value <= 20:
+            band = "10-20%"
+        elif value <= 30:
+            band = "20-30%"
+        elif value <= 40:
+            band = "30-40%"
+        elif value <= 50:
+            band = "40-50%"
+        elif value <= 60:
+            band = "50-60%"
+        elif value <= 70:
+            band = "60-70%"
+        elif value <= 80:
+            band = "70-80%"
+        else:
+            band = "80-100%"
+        bands.append(band)
+    return bands
+
+def get_sum_of_balance_and_average_of_LTV(df, bands):
+    df["band"] = bands
+    sum_of_balance = df.groupby("band")["balance"].sum()
+    average_of_LTV = df.groupby("band")["LTV"].mean()
+    return sum_of_balance, average_of_LTV
+
+if __name__ == "__main__":
+    df = pd.DataFrame({
+        "unique ID": [1, 2, 3, 4, 5],
+        "2050_20": [10, 20, 30, 40, 50],
+        "2080_100": [60, 70, 80, 90, 100],
+        "balance": [100, 200, 300, 400, 500],
+        "LTV": [10, 20, 30, 40, 50]
+    })
+    bands = divide_into_bands(df, "2050_20")
+    sum_of_balance, average_of_LTV = get_sum_of_balance_and_average_of_LTV(df, bands)
+    print(sum_of_balance)
+    print(average_of_LTV)
+
+
 import numpy as np
 
 # Example 10x10 array representing default status (0 or 1)
