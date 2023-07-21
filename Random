@@ -1,313 +1,33 @@
-import pandas as pd
-
-# Create an empty DataFrame to store the pivot table results
-pivot_df = pd.DataFrame()
-
-# Iterate over the columns in output_df
-for column in output_df.columns:
-    if column.endswith('_band'):
-        # Extract the year and return period from the column name
-        year, return_period = column.split('_')[0], column.split('_')[1]
-        
-        # Group the DataFrame by the current column and calculate the sum of 'balance' and average of 'LTV'
-        group_results = output_df.groupby(column).agg({'balance': 'sum', 'LTV': 'mean'})
-        
-        # Reset the index of group_results
-        group_results = group_results.reset_index()
-        
-        # Add 'Year' and 'Return Period' columns to group_results
-        group_results['Year'] = year
-        group_results['Return Period'] = return_period
-        
-        # Reorder the columns
-        group_results = group_results[['Year', 'Return Period', column, 'balance', 'LTV']]
-        
-        # Append group_results to pivot_df
-        pivot_df = pivot_df.append(group_results)
-
-# Sort pivot_df by 'Year', 'Return Period', and the column name
-pivot_df = pivot_df.sort_values(by=['Year', 'Return Period', column])
-
-# Reset the index of pivot_df
-pivot_df = pivot_df.reset_index(drop=True)
-
-# Export pivot_df to a CSV file
-pivot_df.to_csv('output.csv', index=False)
-import pandas as pd
-
-def divide_into_bands(df, column):
-    bands = []
-    for value in df[column]:
-        if value <= 5:
-            band = "0-5%"
-        elif value <= 10:
-            band = "6-10%"
-        elif value <= 20:
-            band = "10-20%"
-        elif value <= 30:
-            band = "20-30%"
-        elif value <= 40:
-            band = "30-40%"
-        elif value <= 50:
-            band = "40-50%"
-        elif value <= 60:
-            band = "50-60%"
-        elif value <= 70:
-            band = "60-70%"
-        elif value <= 80:
-            band = "70-80%"
-        else:
-            band = "80-100%"
-        bands.append(band)
-    return bands
-
-def get_sum_of_balance_and_average_of_LTV(df, bands):
-    df["band"] = bands
-    sum_of_balance = df.groupby("band")["balance"].sum()
-    average_of_LTV = df.groupby("band")["LTV"].mean()
-    return sum_of_balance, average_of_LTV
-
-if __name__ == "__main__":
-    df = pd.DataFrame({
-        "unique ID": [1, 2, 3, 4, 5],
-        "2050_20": [10, 20, 30, 40, 50],
-        "2080_100": [60, 70, 80, 90, 100],
-        "balance": [100, 200, 300, 400, 500],
-        "LTV": [10, 20, 30, 40, 50]
-    })
-    bands = divide_into_bands(df, "2050_20")
-    sum_of_balance, average_of_LTV = get_sum_of_balance_and_average_of_LTV(df, bands)
-    print(sum_of_balance)
-    print(average_of_LTV)
-
-
 import numpy as np
 
-# Example 10x10 array representing default status (0 or 1)
-default_array = np.array([
-    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 0, 1, 1, 0, 1, 0, 1, 1, 0],
-    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 0, 1, 1, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 1, 0, 0, 1, 0, 1, 0],
-    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, ],
-    [1, 0, 1, 0, 1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 1, 0, 1]
-])
+# Assuming 'Stage_indicator' and 'realized_losses' are NumPy arrays with shape (num_sims, num_properties, num_years)
+# Replace 'num_sims', 'num_properties', and 'num_years' with the actual values for your arrays.
 
-# Calculate the number of defaults in the last five years for each property
-defaults_last_five_years = np.sum(default_array[:, -5:], axis=1)
+# Example data (replace this with your actual data)
+num_sims = 2
+num_properties = 3
+num_years = 5
 
-# Identify properties with 3 or more defaults in the last five years
-uninsurable_properties = np.where(defaults_last_five_years >= 3)[0]
+Stage_indicator = np.random.randint(1, 4, size=(num_sims, num_properties, num_years))
+realized_losses = np.random.randint(1, 100, size=(num_sims, num_properties, num_years))
 
-# Create a new array to mark uninsurable properties for the next five years
-insurability_array = np.ones_like(default_array, dtype=bool)
-for property_index in uninsurable_properties:
-    insurability_array[property_index, -5:] = False
+# Calculate the sum of losses for each stage year-wise for every simulation
+stage_losses = np.zeros((num_sims, 3, num_years))  # 3 stages and num_years
+for stage in range(1, 4):  # Stages are 1, 2, 3
+    mask = (Stage_indicator == stage)  # Create a mask for each stage
+    stage_losses[:, stage - 1, :] = np.sum(realized_losses * mask, axis=1)
 
+print("Stage-wise losses year-wise for every simulation:")
+print(stage_losses)
 
-import numpy as np
+# Calculate the average of losses stage-wise across the simulations
+average_stage_losses = np.mean(stage_losses, axis=0)
 
-# Example 5x5 array representing default status (0 or 1)
-default_array = np.array([
-    [1, 0, 1, 0, 1],
-    [0, 0, 1, 1, 0],
-    [1, 0, 1, 0, 1],
-    [0, 1, 0, 0, 1],
-    [1, 0, 1, 0, 1]
-])
+print("Average losses stage-wise across the simulations:")
+print(average_stage_losses)
 
-# Create an empty array to store the results
-defaults_previous_three_years = np.zeros_like(default_array)
+# Calculate the average loss across all years for each stage
+average_loss_all_years = np.mean(average_stage_losses, axis=1)
 
-# Iterate over each year
-for year in range(default_array.shape[1]):
-    # Calculate the number of defaults in the previous three years for each property
-    defaults_previous_three_years[:, year] = np.sum(default_array[:, max(0, year-2):year+1], axis=1)
-
-# Create a new array to mark uninsurable properties for the next two years
-insurability_array = np.ones_like(default_array, dtype=bool)
-
-# Check if a property has defaulted at least two times in the previous three years at each year
-for year in range(defaults_previous_three_years.shape[1]):
-    properties_to_uninsure = np.where(defaults_previous_three_years[:, year] >= 2)[0]
-    for property_index in properties_to_uninsure:
-        insurability_array[property_index, year+1:year+3] = False
-
-# Print the insurability array
-print(insurability_array)
-
-##############££££££££££££££££££££££££
-
-
-
-import numpy as np
-
-# Example 3D array of size (20, 44, 30) representing default status (0 or 1) for 20 simulations
-# with 44 properties over 30 years
-default_array = np.random.randint(0, 2, size=(20, 44, 30))
-
-# Create an empty array to store the results
-defaults_previous_three_years = np.zeros_like(default_array)
-
-# Iterate over each simulation
-for simulation in range(default_array.shape[0]):
-    # Iterate over each year
-    for year in range(default_array.shape[2]):
-        # Calculate the number of defaults in the previous three years for each property
-        defaults_previous_three_years[:, :, year] = np.sum(default_array[:, :, max(0, year-2):year+1], axis=2)
-
-# Create a new array to mark uninsurable properties for the next two years
-insurability_array = np.ones_like(default_array, dtype=bool)
-
-# Check if a property has defaulted at least two times in the previous three years at each year for each simulation
-for simulation in range(defaults_previous_three_years.shape[0]):
-    for year in range(defaults_previous_three_years.shape[2]):
-        properties_to_uninsure = np.where(defaults_previous_three_years[simulation, :, year] >= 2)[0]
-        for property_index in properties_to_uninsure:
-            insurability_array[simulation, property_index, year+1:year+3] = False
-
-# Print the insurability array for the first simulation
-print(insurability_array[0])
--------
-
-import numpy as np
-
-# Input array representing LTV and DTI ratios
-input_array = np.array([
-    [0, 0, 1, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 0, 0, 0, 0],
-    [1, 0, 1, 0, 0],
-    [0, 0, 0, 1, 1]
-])
-
-# Custom ranges for LTV and DTI ratios
-ltv_ranges = [(0, 10), (10, 25), (25, 40), (40, 60), (60, 100)]
-dti_ranges = [(0, 15), (15, 30), (30, 45), (45, 60), (60, 100)]
-
-# Read LTV and DTI values from user
-ltv_value = float(input("Enter the LTV value: "))
-dti_value = float(input("Enter the DTI value: "))
-
-# Find the index of the LTV and DTI bands
-ltv_index = -1
-dti_index = -1
-
-for i, (start, end) in enumerate(ltv_ranges):
-    if ltv_value >= start and ltv_value < end:
-        ltv_index = i
-        break
-
-for i, (start, end) in enumerate(dti_ranges):
-    if dti_value >= start and dti_value < end:
-        dti_index = i
-        break
-
-# Check if the LTV and DTI values result in default or not
-if ltv_index != -1 and dti_index != -1:
-    if input_array[ltv_index][dti_index] == 1:
-        print("Default occurred for the given LTV and DTI values.")
-    else:
-        print("No default occurred for the given LTV and DTI values.")
-else:
-    print("Invalid LTV or DTI value. Please enter values within the valid range.")
---------#######£######
-
-
-
-import numpy as np
-
-# 3D array of LTV ratios (simulations, properties, timesteps)
-ltv_array = np.random.random((20, 44, 30))
-
-# 2D array of properties and DTI bands (properties, 1)
-dti_array = np.random.choice(['low', 'medium', 'high'], size=(44, 1))
-
-# Lookup table of default values based on LTV bands and DTI bands
-lookup_table = np.random.randint(0, 2, size=(5, 3))
-
-# Number of LTV bands
-num_ltv_bands = 5
-
-# Get the dimensions of the arrays
-num_simulations, num_properties, num_timesteps = ltv_array.shape
-
-# Create a result array with the same dimensions as ltv_array
-result_array = np.zeros_like(ltv_array)
-
-# Divide the LTV range into equal bands
-ltv_band_range = np.linspace(0.01, 1.0, num_ltv_bands + 1)
-
-# Iterate over each simulation, property, and timestep
-for sim in range(num_simulations):
-    for prop in range(num_properties):
-        for timestep in range(num_timesteps):
-            # Get the LTV value for the current property and timestep
-            ltv_value = ltv_array[sim, prop, timestep]
-
-            # Get the DTI band for the current property
-            dti_band = dti_array[prop, 0]
-
-            # Find the LTV band index for the current LTV value
-            ltv_band_index = np.searchsorted(ltv_band_range, ltv_value, side='right') - 1
-
-            # Get the default value from the lookup table based on LTV band and DTI band
-            default_value = lookup_table[ltv_band_index, dti_band]
-
-            # Assign the default value to the result array
-            result_array[sim, prop, timestep] = default_value
-
-# Print the result array
-print(result_array)
-
-£££££££££££££££_£
-
-import numpy as np
-
-# Example array with dimensions (no. of simulation, property, year)
-simulation_property_year = np.array([
-    # Simulation 1
-    [
-        [0, 0, 0],  # Property 1, years 1, 2, 3
-        [0, 0, 0],  # Property 2, years 1, 2, 3
-        [0, 0, 0]   # Property 3, years 1, 2, 3
-    ],
-    # Simulation 2
-    [
-        [0, 0, 0],  # Property 1, years 1, 2, 3
-        [0, 0, 0],  # Property 2, years 1, 2, 3
-        [0, 0, 0]   # Property 3, years 1, 2, 3
-    ]
-])
-
-# Calculate the number of properties
-num_properties = simulation_property_year.shape[1]
-
-# Iterate over each year in each simulation
-for simulation in simulation_property_year:
-    for year in simulation.T:
-        # Count the number of eligible properties
-        num_eligible = np.sum(year == 0)
-
-        # Calculate the number of properties to insure
-        num_to_insure = int(num_eligible * 0.98)
-
-        # Randomly select properties to make uninsurable
-        uninsurable_indices = np.random.choice(
-            np.where(year == 0)[0], size=num_eligible - num_to_insure, replace=False
-        )
-
-        # Set the selected properties as uninsurable (1)
-        year[uninsurable_indices] = 1
-
-# Print the final 3D array
-print(simulation_property_year)
-
-
-
-
-
+print("Average loss across all years for each stage:")
+print(average_loss_all_years)
