@@ -11,11 +11,21 @@ num_years = 5
 Stage_indicator = np.random.randint(1, 4, size=(num_sims, num_properties, num_years))
 realized_losses = np.random.randint(1, 100, size=(num_sims, num_properties, num_years))
 
-# Calculate the sum of losses for each stage year-wise for every simulation
+print(Stage_indicator)
+print(realized_losses)
+# Initialize arrays to store results
 stage_losses = np.zeros((num_sims, 3, num_years))  # 3 stages and num_years
+stage_property_count = np.zeros((num_sims, 3, num_years))  # 3 stages and num_years
+
+# Loop through the stages and calculate both losses and property counts
 for stage in range(1, 4):  # Stages are 1, 2, 3
     mask = (Stage_indicator == stage)  # Create a mask for each stage
+    
+    # Calculate losses for each stage year-wise for every simulation
     stage_losses[:, stage - 1, :] = np.sum(realized_losses * mask, axis=1)
+
+    # Calculate property count for each stage year-wise for every simulation
+    stage_property_count[:, stage - 1, :] = np.sum(mask, axis=1)
 
 print("Stage-wise losses year-wise for every simulation:")
 print(stage_losses)
@@ -26,8 +36,23 @@ average_stage_losses = np.mean(stage_losses, axis=0)
 print("Average losses stage-wise across the simulations:")
 print(average_stage_losses)
 
+print("Stage-wise property count year-wise for every simulation:")
+print(stage_property_count)
+
+# Calculate the average of properties stage-wise across the simulations
+average_stage_property_count = np.mean(stage_property_count, axis=0)
+
+print("Average property count stage-wise across the simulations:")
+print(average_stage_property_count)
+
 # Calculate the average loss across all years for each stage
 average_loss_all_years = np.mean(average_stage_losses, axis=1)
 
 print("Average loss across all years for each stage:")
 print(average_loss_all_years)
+
+# Calculate the average property count across all years for each stage
+average_count_all_years = np.mean(average_stage_property_count, axis=1)
+
+print("Average loss across all years for each stage:")
+print(average_count_all_years)
