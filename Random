@@ -166,3 +166,28 @@ pedti_value = 70
 
 stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
 print(f"Stage Value: {stage_value}")
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+import pandas as pd
+
+# Read the Excel sheet
+df = pd.read_excel('data.xlsx', header=[0, 1], index_col=0)
+
+# Get the PELTV and PEDTI band values from the DataFrame
+peltv_bands = df.columns.get_level_values(1).tolist()
+pedti_bands = df.columns.get_level_values(0).tolist()
+
+# Convert DataFrame to nested dictionary format
+nested_dict = df.to_dict()
+
+# Create the final nested dictionary with PELTV as the outer key and PEDTI as inner key
+final_dict = {}
+for peltv in peltv_bands:
+    final_dict[peltv] = {}
+    for pedti in pedti_bands:
+        final_dict[peltv][pedti] = nested_dict[(pedti, peltv)]
+
+print(final_dict)
