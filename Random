@@ -100,3 +100,69 @@ pedti_value = 70
 
 stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
 print(f"Stage Value: {stage_value}")
+
+
+########################## Another approach #######
+import pandas as pd
+
+# Read the Excel sheet
+df = pd.read_excel('data.xlsx', header=[0, 1], index_col=0)
+
+# Convert DataFrame to nested dictionary format
+nested_dict = df.to_dict()
+
+# Extract PELTV values from the dictionary keys
+peltv_values = list(nested_dict.keys())
+
+# Create the final nested dictionary with PELTV as the outer key and PEDTI as inner key
+final_dict = {}
+for peltv in peltv_values:
+    final_dict[peltv] = {
+        40: nested_dict[peltv][('PELTV', 'PEDTI_40')],
+        70: nested_dict[peltv][('PELTV', 'PEDTI_70')],
+        100: nested_dict[peltv][('PELTV', 'PEDTI_100')]
+    }
+
+print(final_dict)
+
+import pandas as pd
+
+# Read Table 1: Damage Ratio (DR) = 0.15
+table_1_data = {
+    40: {40: 1, 70: 2, 100: 1},
+    60: {40: 2, 70: 1, 100: 3},
+    80: {40: 3, 70: 2, 100: 1},
+    90: {40: 1, 70: 3, 100: 2},
+    100: {40: 2, 70: 1, 100: 3}
+}
+
+df_table_1 = pd.DataFrame.from_dict(table_1_data, orient='index')
+df_table_1.index.name = 'PELTV'
+
+# Read Table 2: Damage Ratio (DR) > 0.15 to DR < 0.7
+# Using the same data as Table 1
+df_table_2 = df_table_1.copy()
+
+# Read Table 3: Damage Ratio (DR) > 0.7
+# Using the same data as Table 1
+df_table_3 = df_table_1.copy()
+
+# Function to select the Stage Value based on DR, PELTV, and PEDTI
+def select_stage_value(dr, peltv, pedti):
+    if dr <= 0.15:
+        df = df_table_1
+    elif dr > 0.15 and dr < 0.7:
+        df = df_table_2
+    else:
+        df = df_table_3
+
+    stage_value = df.loc[peltv, pedti]
+    return stage_value
+
+# Example usage:
+dr_value = 0.25
+peltv_value = 90
+pedti_value = 70
+
+stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
+print(f"Stage Value: {stage_value}")
