@@ -76,10 +76,9 @@ df_table_1.index.name = 'PELTV'
 # Convert index and columns to float by dividing by 100
 df_table_1.index = df_table_1.index / 100
 df_table_1.columns = df_table_1.columns / 100
-print(df_table_1)
 df_table_2 = df_table_1.copy()
 
-
+print(df_table_1)
 # Read Table 3: Damage Ratio (DR) > 0.7
 # Using the same data as Table 1
 df_table_3 = df_table_1.copy()
@@ -88,42 +87,27 @@ given_peltv = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
 given_pedti = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
 damage_ratio = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
 
-# Initialize an empty 3D array to store the stage values for each property
-stage_values = np.zeros_like(damage_ratio)
+# Create an array of PELTV bands and PEDTI bands using pd.cut
+peltv_bands = df_table_1.index.values
+pedti_bands = df_table_1.columns.values
 
-# Loop through simulations, properties, and years to calculate the stage values
-for sim in range(given_peltv.shape[0]):
-    for prop in range(given_peltv.shape[1]):
-        for year in range(given_peltv.shape[2]):
-            # Clip the given values to the range [0, 1]
-            clipped_peltv = np.clip(given_peltv[sim, prop, year], 0, 1)
-            clipped_pedti = np.clip(given_pedti[sim, prop, year], 0, 1)
-            print(clipped_peltv, clipped_pedti)
+# Use pd.cut to find the corresponding bands for each simulation, property, and year
+peltv_indices = np.searchsorted(peltv_bands, given_peltv)
+pedti_indices = np.searchsorted(pedti_bands, given_pedti)
+print(peltv_indices)
+print(pedti_indices)
+# Clip the indices to handle values exceeding the maximum band value
+peltv_indices = np.clip(peltv_indices, 0, len(peltv_bands) - 1)
+pedti_indices = np.clip(pedti_indices, 0, len(pedti_bands) - 1)
+print(peltv_indices)
+print(pedti_indices)
+# Find the stage values using NumPy's advanced indexing
+stage_values = df_table_1.values[peltv_indices, pedti_indices]
 
-            # Find corresponding bands for PELTV and PEDTI
-            peltv_band = next(filter(lambda x: clipped_peltv < x, df_table_1.index), df_table_1.index[-1])
-            pedti_band = next(filter(lambda x: clipped_pedti < x, df_table_1.columns), df_table_1.columns[-1])
-
-            print(peltv_band, pedti_band)
-            # Choose the appropriate DataFrame based on the damage_ratio value
-            if damage_ratio[sim, prop, year] <= 0.15:
-                df_table = df_table_1
-            elif 0.15 < damage_ratio[sim, prop, year] < 0.7:
-                df_table = df_table_2  # You should define df_table_2 for Table 2
-            else:
-                df_table = df_table_3  # You should define df_table_3 for Table 3
-
-            # Calculate the stage value based on the intersection of the bands
-            try:
-                stage_value = df_table.loc[peltv_band, pedti_band]
-                print('In try')
-            except KeyError:
-                print('in except')
-                # If the given value exceeds the maximum index value, use the last band value
-                stage_value = df_table.iloc[-1, -1]
-
-            # Store the stage value in the output array
-            stage_values[sim, prop, year] = stage_value
+# Apply condition to choose the appropriate DataFrame based on the damage_ratio value
+damage_ratio_condition = (damage_ratio <= 0.15)
+stage_values[damage_ratio > 0.15] = df_table_2.values[peltv_indices[damage_ratio > 0.15], pedti_indices[damage_ratio > 0.15]]
+stage_values[damage_ratio > 0.7] = df_table_3.values[peltv_indices[damage_ratio > 0.7], pedti_indices[damage_ratio > 0.7]]
 
 print("Given PELTV:")
 print(given_peltv)
@@ -132,4 +116,6 @@ print(given_pedti)
 print("Damage Ratio:")
 print(damage_ratio)
 print("Stage Values:")
+print(stage_values)
+
 print(stage_values)
