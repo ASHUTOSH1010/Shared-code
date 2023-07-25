@@ -58,73 +58,7 @@ print("Average loss across all years for each stage:")
 print(average_count_all_years)
 
 
-***************Excel *************
-
-import pandas as pd
-
-# Read Table 1: Damage Ratio (DR) = 0.15
-table_1_data = {
-    'PELTV': [40, 60, 80, 90, 100],
-    'PEDTI_40': [1, 2, 3, 1, 2],
-    'PEDTI_70': [2, 1, 2, 3, 1],
-    'PEDTI_100': [1, 3, 1, 2, 3]
-}
-
-df_table_1 = pd.DataFrame(table_1_data)
-df_table_1.set_index('PELTV', inplace=True)
-
-# Read Table 2: Damage Ratio (DR) > 0.15 to DR < 0.7
-# Using the same data as Table 1
-df_table_2 = df_table_1.copy()
-
-# Read Table 3: Damage Ratio (DR) > 0.7
-# Using the same data as Table 1
-df_table_3 = df_table_1.copy()
-
-# Function to select the Stage Value based on DR, PELTV, and PEDTI
-def select_stage_value(dr, peltv, pedti):
-    if dr <= 0.15:
-        df = df_table_1
-    elif dr > 0.15 and dr < 0.7:
-        df = df_table_2
-    else:
-        df = df_table_3
-
-    stage_value = df.loc[peltv, f'PEDTI_{pedti}']
-    return stage_value
-
-# Example usage:
-dr_value = 0.25
-peltv_value = 90
-pedti_value = 70
-
-stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
-print(f"Stage Value: {stage_value}")
-
-
-########################## Another approach #######
-import pandas as pd
-
-# Read the Excel sheet
-df = pd.read_excel('data.xlsx', header=[0, 1], index_col=0)
-
-# Convert DataFrame to nested dictionary format
-nested_dict = df.to_dict()
-
-# Extract PELTV values from the dictionary keys
-peltv_values = list(nested_dict.keys())
-
-# Create the final nested dictionary with PELTV as the outer key and PEDTI as inner key
-final_dict = {}
-for peltv in peltv_values:
-    final_dict[peltv] = {
-        40: nested_dict[peltv][('PELTV', 'PEDTI_40')],
-        70: nested_dict[peltv][('PELTV', 'PEDTI_70')],
-        100: nested_dict[peltv][('PELTV', 'PEDTI_100')]
-    }
-
-print(final_dict)
-
+import numpy as np
 import pandas as pd
 
 # Read Table 1: Damage Ratio (DR) = 0.15
@@ -139,55 +73,63 @@ table_1_data = {
 df_table_1 = pd.DataFrame.from_dict(table_1_data, orient='index')
 df_table_1.index.name = 'PELTV'
 
-# Read Table 2: Damage Ratio (DR) > 0.15 to DR < 0.7
-# Using the same data as Table 1
+# Convert index and columns to float by dividing by 100
+df_table_1.index = df_table_1.index / 100
+df_table_1.columns = df_table_1.columns / 100
+print(df_table_1)
 df_table_2 = df_table_1.copy()
+
 
 # Read Table 3: Damage Ratio (DR) > 0.7
 # Using the same data as Table 1
 df_table_3 = df_table_1.copy()
+# Create 3D arrays for given_peltv, given_pedti, and damage_ratio
+given_peltv = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
+given_pedti = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
+damage_ratio = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
 
-# Function to select the Stage Value based on DR, PELTV, and PEDTI
-def select_stage_value(dr, peltv, pedti):
-    if dr <= 0.15:
-        df = df_table_1
-    elif dr > 0.15 and dr < 0.7:
-        df = df_table_2
-    else:
-        df = df_table_3
+# Initialize an empty 3D array to store the stage values for each property
+stage_values = np.zeros_like(damage_ratio)
 
-    stage_value = df.loc[peltv, pedti]
-    return stage_value
+# Loop through simulations, properties, and years to calculate the stage values
+for sim in range(given_peltv.shape[0]):
+    for prop in range(given_peltv.shape[1]):
+        for year in range(given_peltv.shape[2]):
+            # Clip the given values to the range [0, 1]
+            clipped_peltv = np.clip(given_peltv[sim, prop, year], 0, 1)
+            clipped_pedti = np.clip(given_pedti[sim, prop, year], 0, 1)
+            print(clipped_peltv, clipped_pedti)
 
-# Example usage:
-dr_value = 0.25
-peltv_value = 90
-pedti_value = 70
+            # Find corresponding bands for PELTV and PEDTI
+            peltv_band = next(filter(lambda x: clipped_peltv < x, df_table_1.index), df_table_1.index[-1])
+            pedti_band = next(filter(lambda x: clipped_pedti < x, df_table_1.columns), df_table_1.columns[-1])
 
-stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
-print(f"Stage Value: {stage_value}")
+            print(peltv_band, pedti_band)
+            # Choose the appropriate DataFrame based on the damage_ratio value
+            if damage_ratio[sim, prop, year] <= 0.15:
+                df_table = df_table_1
+            elif 0.15 < damage_ratio[sim, prop, year] < 0.7:
+                df_table = df_table_2  # You should define df_table_2 for Table 2
+            else:
+                df_table = df_table_3  # You should define df_table_3 for Table 3
 
+            # Calculate the stage value based on the intersection of the bands
+            try:
+                stage_value = df_table.loc[peltv_band, pedti_band]
+                print('In try')
+            except KeyError:
+                print('in except')
+                # If the given value exceeds the maximum index value, use the last band value
+                stage_value = df_table.iloc[-1, -1]
 
+            # Store the stage value in the output array
+            stage_values[sim, prop, year] = stage_value
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-import pandas as pd
-
-# Read the Excel sheet
-df = pd.read_excel('data.xlsx', header=[0, 1], index_col=0)
-
-# Get the PELTV and PEDTI band values from the DataFrame
-peltv_bands = df.columns.get_level_values(1).tolist()
-pedti_bands = df.columns.get_level_values(0).tolist()
-
-# Convert DataFrame to nested dictionary format
-nested_dict = df.to_dict()
-
-# Create the final nested dictionary with PELTV as the outer key and PEDTI as inner key
-final_dict = {}
-for peltv in peltv_bands:
-    final_dict[peltv] = {}
-    for pedti in pedti_bands:
-        final_dict[peltv][pedti] = nested_dict[(pedti, peltv)]
-
-print(final_dict)
+print("Given PELTV:")
+print(given_peltv)
+print("Given PEDTI:")
+print(given_pedti)
+print("Damage Ratio:")
+print(damage_ratio)
+print("Stage Values:")
+print(stage_values)
