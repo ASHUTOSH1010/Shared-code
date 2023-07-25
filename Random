@@ -56,3 +56,47 @@ average_count_all_years = np.mean(average_stage_property_count, axis=1)
 
 print("Average loss across all years for each stage:")
 print(average_count_all_years)
+
+
+***************Excel *************
+
+import pandas as pd
+
+# Read Table 1: Damage Ratio (DR) = 0.15
+table_1_data = {
+    'PELTV': [40, 60, 80, 90, 100],
+    'PEDTI_40': [1, 2, 3, 1, 2],
+    'PEDTI_70': [2, 1, 2, 3, 1],
+    'PEDTI_100': [1, 3, 1, 2, 3]
+}
+
+df_table_1 = pd.DataFrame(table_1_data)
+df_table_1.set_index('PELTV', inplace=True)
+
+# Read Table 2: Damage Ratio (DR) > 0.15 to DR < 0.7
+# Using the same data as Table 1
+df_table_2 = df_table_1.copy()
+
+# Read Table 3: Damage Ratio (DR) > 0.7
+# Using the same data as Table 1
+df_table_3 = df_table_1.copy()
+
+# Function to select the Stage Value based on DR, PELTV, and PEDTI
+def select_stage_value(dr, peltv, pedti):
+    if dr <= 0.15:
+        df = df_table_1
+    elif dr > 0.15 and dr < 0.7:
+        df = df_table_2
+    else:
+        df = df_table_3
+
+    stage_value = df.loc[peltv, f'PEDTI_{pedti}']
+    return stage_value
+
+# Example usage:
+dr_value = 0.25
+peltv_value = 90
+pedti_value = 70
+
+stage_value = select_stage_value(dr_value, peltv_value, pedti_value)
+print(f"Stage Value: {stage_value}")
