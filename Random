@@ -1,121 +1,25 @@
 import numpy as np
 
-# Assuming 'Stage_indicator' and 'realized_losses' are NumPy arrays with shape (num_sims, num_properties, num_years)
-# Replace 'num_sims', 'num_properties', and 'num_years' with the actual values for your arrays.
+# Your 3D array
+#dd = np.random.randint(low=10, high=20, size=(2, 2, 7))
+dd = np.array([[[17, 13, 18, 14, 17, 16, 16],
+        [17, 17, 11, 10, 12, 17, 13]],
 
-# Example data (replace this with your actual data)
-num_sims = 2
-num_properties = 3
-num_years = 5
+       [[16, 16, 13, 13, 18, 16, 17],
+        [14, 13, 11, 18, 18, 11, 14]]])
+print(dd)
+# Initialize an array of the same shape as dd
+new_dd = np.zeros(dd.shape)
 
-Stage_indicator = np.random.randint(1, 4, size=(num_sims, num_properties, num_years))
-realized_losses = np.random.randint(1, 100, size=(num_sims, num_properties, num_years))
-
-print(Stage_indicator)
-print(realized_losses)
-# Initialize arrays to store results
-stage_losses = np.zeros((num_sims, 3, num_years))  # 3 stages and num_years
-stage_property_count = np.zeros((num_sims, 3, num_years))  # 3 stages and num_years
-
-# Loop through the stages and calculate both losses and property counts
-for stage in range(1, 4):  # Stages are 1, 2, 3
-    mask = (Stage_indicator == stage)  # Create a mask for each stage
-    
-    # Calculate losses for each stage year-wise for every simulation
-    stage_losses[:, stage - 1, :] = np.sum(realized_losses * mask, axis=1)
-
-    # Calculate property count for each stage year-wise for every simulation
-    stage_property_count[:, stage - 1, :] = np.sum(mask, axis=1)
-
-print("Stage-wise losses year-wise for every simulation:")
-print(stage_losses)
-
-# Calculate the average of losses stage-wise across the simulations
-average_stage_losses = np.mean(stage_losses, axis=0)
-
-print("Average losses stage-wise across the simulations:")
-print(average_stage_losses)
-
-print("Stage-wise property count year-wise for every simulation:")
-print(stage_property_count)
-
-# Calculate the average of properties stage-wise across the simulations
-average_stage_property_count = np.mean(stage_property_count, axis=0)
-
-print("Average property count stage-wise across the simulations:")
-print(average_stage_property_count)
-
-# Calculate the average loss across all years for each stage
-average_loss_all_years = np.mean(average_stage_losses, axis=1)
-
-print("Average loss across all years for each stage:")
-print(average_loss_all_years)
-
-# Calculate the average property count across all years for each stage
-average_count_all_years = np.mean(average_stage_property_count, axis=1)
-
-print("Average loss across all years for each stage:")
-print(average_count_all_years)
-
-
-import numpy as np
-import pandas as pd
-
-# Read Table 1: Damage Ratio (DR) = 0.15
-table_1_data = {
-    40: {40: 1, 70: 2, 100: 1},
-    60: {40: 2, 70: 1, 100: 3},
-    80: {40: 3, 70: 2, 100: 1},
-    90: {40: 1, 70: 3, 100: 2},
-    100: {40: 2, 70: 1, 100: 3}
-}
-
-df_table_1 = pd.DataFrame.from_dict(table_1_data, orient='index')
-df_table_1.index.name = 'PELTV'
-
-# Convert index and columns to float by dividing by 100
-df_table_1.index = df_table_1.index / 100
-df_table_1.columns = df_table_1.columns / 100
-df_table_2 = df_table_1.copy()
-
-print(df_table_1)
-# Read Table 3: Damage Ratio (DR) > 0.7
-# Using the same data as Table 1
-df_table_3 = df_table_1.copy()
-# Create 3D arrays for given_peltv, given_pedti, and damage_ratio
-given_peltv = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
-given_pedti = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
-damage_ratio = np.random.rand(1, 2, 2)  # Random float values between 0 and 1
-
-# Create an array of PELTV bands and PEDTI bands using pd.cut
-peltv_bands = df_table_1.index.values
-pedti_bands = df_table_1.columns.values
-
-# Use pd.cut to find the corresponding bands for each simulation, property, and year
-peltv_indices = np.searchsorted(peltv_bands, given_peltv)
-pedti_indices = np.searchsorted(pedti_bands, given_pedti)
-print(peltv_indices)
-print(pedti_indices)
-# Clip the indices to handle values exceeding the maximum band value
-peltv_indices = np.clip(peltv_indices, 0, len(peltv_bands) - 1)
-pedti_indices = np.clip(pedti_indices, 0, len(pedti_bands) - 1)
-print(peltv_indices)
-print(pedti_indices)
-# Find the stage values using NumPy's advanced indexing
-stage_values = df_table_1.values[peltv_indices, pedti_indices]
-
-# Apply condition to choose the appropriate DataFrame based on the damage_ratio value
-damage_ratio_condition = (damage_ratio <= 0.15)
-stage_values[damage_ratio > 0.15] = df_table_2.values[peltv_indices[damage_ratio > 0.15], pedti_indices[damage_ratio > 0.15]]
-stage_values[damage_ratio > 0.7] = df_table_3.values[peltv_indices[damage_ratio > 0.7], pedti_indices[damage_ratio > 0.7]]
-
-print("Given PELTV:")
-print(given_peltv)
-print("Given PEDTI:")
-print(given_pedti)
-print("Damage Ratio:")
-print(damage_ratio)
-print("Stage Values:")
-print(stage_values)
-
-print(stage_values)
+# Loop over each simulation and property
+for i in range(dd.shape[0]):
+    for j in range(dd.shape[1]):
+        # U1 = T1
+        new_dd[i, j, 0] = dd[i, j, 0]
+        # For each year from U2 to U7
+        for k in range(1, dd.shape[2]):
+            # Calculate the value based on previous years
+            for l in range(min(k+1, 5)):  # Only consider the last 5 years
+                new_dd[i, j, k] += dd[i, j, k-l] * (1 - 0.2*l)
+                
+print(new_dd)
