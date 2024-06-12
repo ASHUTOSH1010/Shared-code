@@ -54,3 +54,19 @@ submit_button.on_click(on_button_click)
 
 # Display widgets
 display(country_dropdown, portfolio_dropdown, submit_button, output)
+
+
+<button onclick="toggleCode()">Toggle Code</button>
+<script>
+function toggleCode() {
+    var cells = document.querySelectorAll('.code_cell');
+    for (var i = 0; i < cells.length; i++) {
+        var cell = cells[i];
+        if (cell.style.display === 'none') {
+            cell.style.display = 'block';
+        } else {
+            cell.style.display = 'none';
+        }
+    }
+}
+</script>
