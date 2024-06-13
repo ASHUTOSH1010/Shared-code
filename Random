@@ -10,63 +10,58 @@ df = pd.read_excel(excel_file, sheet_name='Sheet1')
 countries = ['All'] + df['Country'].unique().tolist()
 portfolios = ['All'] + df['Portfolio'].unique().tolist()
 
-# Widgets
-country_dropdown = widgets.Dropdown(
-    options=countries,
-    value='All',
-    description='Country:'
-)
+def create_filter_widgets():
+    country_dropdown = widgets.Dropdown(
+        options=countries,
+        value='All',
+        description='Country:'
+    )
 
-portfolio_dropdown = widgets.Dropdown(
-    options=portfolios,
-    value='All',
-    description='Portfolio:'
-)
+    portfolio_dropdown = widgets.Dropdown(
+        options=portfolios,
+        value='All',
+        description='Portfolio:'
+    )
+    
+    return country_dropdown, portfolio_dropdown
 
+# Initialize the form
+filters = []
+add_button = widgets.Button(
+    description='Add Filter',
+    button_style='success'
+)
 submit_button = widgets.Button(
     description='Filter Data',
     button_style='primary'
 )
-
-# Output area
 output = widgets.Output()
 
-# Define callback function
-def on_button_click(b):
-    # Get selected values
-    selected_country = country_dropdown.value
-    selected_portfolio = portfolio_dropdown.value
-    
-    # Filter data
+def add_filter(_):
+    country_dropdown, portfolio_dropdown = create_filter_widgets()
+    filters.append((country_dropdown, portfolio_dropdown))
+    filter_box.children += (widgets.HBox([country_dropdown, portfolio_dropdown]),)
+
+def filter_data(_):
     filtered_data = df.copy()
-    if selected_country != 'All':
-        filtered_data = filtered_data[filtered_data['Country'] == selected_country]
-    if selected_portfolio != 'All':
-        filtered_data = filtered_data[filtered_data['Portfolio'] == selected_portfolio]
+    for country_dropdown, portfolio_dropdown in filters:
+        selected_country = country_dropdown.value
+        selected_portfolio = portfolio_dropdown.value
+        if selected_country != 'All':
+            filtered_data = filtered_data[filtered_data['Country'] == selected_country]
+        if selected_portfolio != 'All':
+            filtered_data = filtered_data[filtered_data['Portfolio'] == selected_portfolio]
     
-    # Display filtered data
     with output:
         clear_output(wait=True)
         display(filtered_data)
 
-# Set up the button click event
-submit_button.on_click(on_button_click)
+add_button.on_click(add_filter)
+submit_button.on_click(filter_data)
 
-# Display widgets
-display(country_dropdown, portfolio_dropdown, submit_button, output)
+filter_box = widgets.VBox()
+initial_country_dropdown, initial_portfolio_dropdown = create_filter_widgets()
+filters.append((initial_country_dropdown, initial_portfolio_dropdown))
+filter_box.children = [widgets.HBox([initial_country_dropdown, initial_portfolio_dropdown])]
 
-
-<button onclick="toggleCode()">Toggle Code</button>
-<script>
-function toggleCode() {
-    var cells = document.querySelectorAll('.code_cell');
-    for (var i = 0; i < cells.length; i++) {
-        var cell = cells[i];
-        if (cell.style.display === 'none') {
-            cell.style.display = 'block';
-        } else {
-            cell.style.display = 'none';
-        }
-    }
-}
-</script>
+display(add_button, filter_box, submit_button, output)
