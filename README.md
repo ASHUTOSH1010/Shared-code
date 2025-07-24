@@ -1,16 +1,94 @@
-4.3.3 DQM Assumptions and Limitations The DQM Assessment in Section 4.5 details the inherent limitations and assumptions of the Stranded Asset Analysis. Key assumptions include the conservative choice of the RCP 8.5 pathway for chronic risks, and the expert judgment applied in selecting mitigant thresholds. A significant assumption is the complete phase-out of insurance benefits from 2031 onwards due to anticipated market failures and regulatory conservatism, as detailed in Section 4.2.4. Data availability and usability challenges for property age and type across certain markets (e.g., Korea, Taiwan, India) are also acknowledged limitations, necessitating expert judgment for 'best-effort' analysis.
-4.3.4 Use of Expert Judgment Expert judgment plays a critical role throughout the SAA process, compensating for data gaps and guiding strategic decisions. This is explicitly reflected in the Python script's logic where:
-Scenario Selection: Expert judgment guided the selection of RCP 8.5 for chronic risks in the stress test scenario.
-Mitigant Thresholds: The specific thresholds for Flood Defense SOP (\\le 20), Property Age (pre-1970), and Distance to Coast (\\le 1 \\text{km}) are based on expert consensus to define vulnerability.
-Property Type Proxies: The use of 'Grounded' property types as a proxy for lower floors due to lack of elevation data is an application of expert judgment.
-Insurance Treatment: The decision to cease factoring in insurance benefits from 2031 onward, driven by the anticipation of market failure and regulatory guidance, is a key application of expert judgment.
-Handling of Missing Data: For countries where Property Age or Property Type data is 'not sourced' or 'not usable', expert judgment guides the 'best-effort' analytical approach, as captured in the script's conditional logic for flagging stranded properties.
-4.4 DQM Output
-The primary and most critical output of the Stranded Asset Analysis is the quantitative assessment of potential financial losses stemming from physical climate risks. This assessment is directly translated into a management adjustment to Expected Credit Losses (ECL) / Loan Impairment (LI). This management adjustment serves as a vital input for:
-Climate Risk Provisioning: Informing the bank's financial reserves against climate-related losses.
-Capital Adequacy Discussions: Contributing to assessments like the ICAAP (Internal Capital Adequacy Assessment Process) capital add-on.
-Regulatory Stress Testing: Providing key data points for exercises such as the HKMA Climate Risk Stress Test (CRST).
-The analysis further provides a granular breakdown of the identified Stranded Assets (in USD billions), categorized by country and specific risk type (Acute vs. Chronic). For instance, the analysis projects material losses, exemplified by USD 2.7 billion for the MST 2025 scenario. These detailed outputs enable targeted risk management strategies and informed decision-making.
-Python Script Output Generation: The Python script explicitly generates several key outputs to summarize the results of the SAA.
-It creates a pivot table (pivot_df) summarizing the outstanding_usd for the overall portfolio, segmented by 'Country Code'. This provides a high-level view of the portfolio's distribution.
-The script also generates sensitivity tables, such as SOP_Sensitivity_Table and Coast_Distance_Sensitivity_Table, which show the total outstanding_usd (in millions) of stranded assets under different thresholds for Flood Defense SOP and Distance to Coast, respectively. These tables are crucial for understanding the robustness of the stranded asset figures to changes in key mitigant assumptions.
+Thank you for providing the content of "Section 7." This is very helpful as it provides the explicit details on those limitations and assumptions.
+I can confirm that the core points from your provided "Section 7" regarding Data Availability and Usability and Scenario Specifications were already largely captured in the table I generated previously. However, your explicit content allows for more precision and completeness, particularly by adding the Mortgage Geo-coordinates limitation and refining the details on the scenario phasing.
+Here is the updated and more precise table incorporating all the details from your "Section 7" images:
+Table: DQM Assumptions & Limitations: Stranded Asset Analysis (SAA)
+Assumptions/Limitation
+Description
+Materiality/Impact
+Mitigation
+A/L
+Conservative Climate Scenario Selection (RCP 8.5 Phasing)
+The analysis utilizes the RCP 8.5 pathway for long-term chronic risks (to 2050). For the "Tail Physical Risk" scenario, acute risk impacts are applied from 2024, while chronic risk impacts are applied from 2041.
+Leads to more stressed losses and a conservative estimate of stranded assets, particularly under the Tail Physical Risk scenario due to earlier recognition of acute impacts.
+This choice aligns with the objective of a robust stress test, ensuring a prudent assessment of tail risks. A high degree of expert judgment is applied in selecting and combining RCP and SSP scenarios to define relevant climate pathways.
+A
+Expert-Defined Mitigant Thresholds
+Specific thresholds for various mitigants (e.g., Flood Defense SOP \le 20, Property Age pre-1970, Distance to Coast \le 1 \text{km}) are determined based on expert judgment.
+Directly influences the number of properties classified as "stranded" and the magnitude of estimated losses.
+Thresholds are established through expert consensus and are clearly defined within the model's methodology, reflecting best available knowledge.
+A
+Complete Phase-out of Insurance Benefits Post-2030
+Insurance benefits are assumed to cease entirely from 2031 onwards for all markets, and are only considered for mandatory insurance markets (HK, China, UAE) up to 2030.
+Significantly increases projected losses after 2030 as a critical financial mitigant is removed. Impacts potential ECL/LI adjustments by an estimated USD30m benefit up to 2030.
+This assumption is driven by regulatory guidance (HKMA CRST), internal discussions, and external research anticipating future insurance market failures, affordability issues, and availability challenges in climate-vulnerable areas. It represents a prudent and conservative stance on long-term insurability.
+A
+Use of Property Type as Elevation Proxy
+Due to the unavailability of direct data on property floor levels, property type (e.g., 'Grounded' vs. 'Non-Grounded' categories like standalone houses vs. apartments) is used as a proxy for a property's susceptibility to ground-level flooding.
+May not precisely reflect the actual flood exposure of every individual property, potentially leading to misclassification in some cases.
+This is a pragmatic approximation given data limitations. The categorization relies on reasonable assumptions about the typical construction and location of different property types.
+A
+Simplified Loss Calculation (Full Value Erosion)
+The model assumes a complete erosion of value for properties identified as stranded assets, with losses directly equaling the outstanding balance of these assets.
+Might overestimate actual losses by not accounting for potential partial damages, residual value, or recovery rates post-event.
+This approach simplifies complex damage modeling for stress testing purposes and provides a conservative estimate of potential maximum losses.
+A
+Limited Data Availability & Usability for Property Attributes
+There are significant challenges with the availability and usability of granular Property Age data (not sourced/usable for Korea, Taiwan, India) and Property Type data (not sourced/usable for Korea, Singapore, Taiwan, India) across various markets.
+Requires 'best-effort' analysis and default assumptions in affected segments, which could impact the precision of stranded asset identification.
+Expert judgment is applied to guide the 'best-effort' analysis in segments with data gaps. The Python script's logic handles missing data by defaulting to a vulnerable classification when necessary. Active engagement with country teams is ongoing for future data capture improvement.
+L
+Limited Mortgage Geo-coordinates Availability
+Mortgage geo-coordinates are not fully available for a few markets.
+For affected markets, country-level averages are used for climate risk mapping, which may not accurately reflect property-specific risk.
+Applied expert judgment and 'best-effort' analysis by using country-level averages as a proxy where granular data is unavailable. Engagement with country teams is ongoing for future data capture improvement.
+L
+
+
+
+
+Thank you for providing the content of "Section 7." This is very helpful as it provides the explicit details on those limitations and assumptions.
+I can confirm that the core points from your provided "Section 7" regarding Data Availability and Usability and Scenario Specifications were already largely captured in the table I generated previously. However, your explicit content allows for more precision and completeness, particularly by adding the Mortgage Geo-coordinates limitation and refining the details on the scenario phasing.
+Here is the updated and more precise table incorporating all the details from your "Section 7" images:
+Table: DQM Assumptions & Limitations: Stranded Asset Analysis (SAA)
+Assumptions/Limitation
+Description
+Materiality/Impact
+Mitigation
+A/L
+Conservative Climate Scenario Selection (RCP 8.5 Phasing)
+The analysis utilizes the RCP 8.5 pathway for long-term chronic risks (to 2050). For the "Tail Physical Risk" scenario, acute risk impacts are applied from 2024, while chronic risk impacts are applied from 2041.
+Leads to more stressed losses and a conservative estimate of stranded assets, particularly under the Tail Physical Risk scenario due to earlier recognition of acute impacts.
+This choice aligns with the objective of a robust stress test, ensuring a prudent assessment of tail risks. A high degree of expert judgment is applied in selecting and combining RCP and SSP scenarios to define relevant climate pathways.
+A
+Expert-Defined Mitigant Thresholds
+Specific thresholds for various mitigants (e.g., Flood Defense SOP \le 20, Property Age pre-1970, Distance to Coast \le 1 \text{km}) are determined based on expert judgment.
+Directly influences the number of properties classified as "stranded" and the magnitude of estimated losses.
+Thresholds are established through expert consensus and are clearly defined within the model's methodology, reflecting best available knowledge.
+A
+Complete Phase-out of Insurance Benefits Post-2030
+Insurance benefits are assumed to cease entirely from 2031 onwards for all markets, and are only considered for mandatory insurance markets (HK, China, UAE) up to 2030.
+Significantly increases projected losses after 2030 as a critical financial mitigant is removed. Impacts potential ECL/LI adjustments by an estimated USD30m benefit up to 2030.
+This assumption is driven by regulatory guidance (HKMA CRST), internal discussions, and external research anticipating future insurance market failures, affordability issues, and availability challenges in climate-vulnerable areas. It represents a prudent and conservative stance on long-term insurability.
+A
+Use of Property Type as Elevation Proxy
+Due to the unavailability of direct data on property floor levels, property type (e.g., 'Grounded' vs. 'Non-Grounded' categories like standalone houses vs. apartments) is used as a proxy for a property's susceptibility to ground-level flooding.
+May not precisely reflect the actual flood exposure of every individual property, potentially leading to misclassification in some cases.
+This is a pragmatic approximation given data limitations. The categorization relies on reasonable assumptions about the typical construction and location of different property types.
+A
+Simplified Loss Calculation (Full Value Erosion)
+The model assumes a complete erosion of value for properties identified as stranded assets, with losses directly equaling the outstanding balance of these assets.
+Might overestimate actual losses by not accounting for potential partial damages, residual value, or recovery rates post-event.
+This approach simplifies complex damage modeling for stress testing purposes and provides a conservative estimate of potential maximum losses.
+A
+Limited Data Availability & Usability for Property Attributes
+There are significant challenges with the availability and usability of granular Property Age data (not sourced/usable for Korea, Taiwan, India) and Property Type data (not sourced/usable for Korea, Singapore, Taiwan, India) across various markets.
+Requires 'best-effort' analysis and default assumptions in affected segments, which could impact the precision of stranded asset identification.
+Expert judgment is applied to guide the 'best-effort' analysis in segments with data gaps. The Python script's logic handles missing data by defaulting to a vulnerable classification when necessary. Active engagement with country teams is ongoing for future data capture improvement.
+L
+Limited Mortgage Geo-coordinates Availability
+Mortgage geo-coordinates are not fully available for a few markets.
+For affected markets, country-level averages are used for climate risk mapping, which may not accurately reflect property-specific risk.
+Applied expert judgment and 'best-effort' analysis by using country-level averages as a proxy where granular data is unavailable. Engagement with country teams is ongoing for future data capture improvement.
+L
+
+
