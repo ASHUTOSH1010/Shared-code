@@ -68,3 +68,132 @@ Beyond 2031, the analysis prudently assumes that no insurance benefits will be a
    * It is noted that Mortgage Indemnity Policy (MIP) may not cover loss linked to stranded properties, or damages may need to be repairable and costs coverable from property insurance proceeds.
 Application in Scenarios:
 Due to these considerations, insurance benefits are applied only in the Tail Physical Risk scenario up to 2030, where losses appear earlier. They are not applied in the "Current Policies" scenario, as stranded assets are projected to emerge only after 2041 under that less severe pathway, coinciding with the period of assumed insurance unavailability. This approach aligns with recommendations from Stress Test Forum (STF) members, who advocated for recognizing existing insurance benefits in the initial years. It is assumed that 100% of stranded asset losses are covered by insurance until 2030, with an estimated benefit of approximately USD30m.
+
+
+Based on the content from both images, here is a well-written “Methodology – Stranded Assets Assessment” section for your Technical Development Document (TDD) in alignment with DRR3 expectations and your MST 2024 context:
+
+
+---
+
+Section 4 – Methodology: Stranded Assets Assessment
+
+This section outlines the methodology used to estimate management adjustments related to stranded assets under physical climate risk scenarios. The focus is on properties exposed to “Extreme” risk levels under the RCP 8.5 climate pathway (2050 horizon) across flood, storm, and sea level rise hazards.
+
+
+---
+
+Definition of Stranded Assets
+
+Stranded assets are defined as properties expected to become uninhabitable or unusable due to climate-induced physical risks. These assets are assumed to experience a complete erosion in property value, necessitating full credit loss recognition for associated mortgage exposures.
+
+
+---
+
+Rationale for Adjustments
+
+Existing credit models, including PPI haircuts (e.g., from Munich Re), are applied at the portfolio level and may not capture tail-risk events such as total stranding of certain high-risk assets.
+
+The stranded assets methodology introduces additional management overlays to explicitly account for climate tail scenarios that go beyond average portfolio impacts.
+
+The adjustments are scoped strictly for current lending policies and tail physical climate scenarios.
+
+
+
+---
+
+Hazard Types Considered
+
+Only the most material physical hazards are included in the stranded asset assessment:
+
+Flood Risk: Includes flash flood, coastal flood, and storm surge.
+
+Storm Risk: Includes tropical cyclone, extratropical cyclone, hail, tornado, and lightning.
+
+Sea Level Rise: Chronic hazard with long-term uninhabitability potential.
+
+
+Exclusions:
+
+Heat stress is excluded as it is more relevant for transition risk rather than acute or chronic stranding.
+
+Precipitation stress is not separately modeled, as it is already embedded in flood and storm projections.
+
+
+
+---
+
+Stranded Asset Criteria
+
+Properties are classified as stranded if they meet any of the following physical or structural vulnerability criteria:
+
+1. “Extreme” Risk Classification under RCP 8.5 scenario by 2050 (as per Munich Re risk scoring).
+
+
+2. Property Age: Built before 1970 (older structures assumed to have lower resilience).
+
+
+3. Building Type: Standalone bungalows, villas, semi-detached and village-type houses are included due to higher exposure and repair costs.
+
+
+4. Flood Defense SOP < 20: Properties in areas with poor protection are included.
+
+
+5. Distance to Coast < 1km: Used for chronic sea-level rise exposures.
+
+
+6. No Insurance Coverage Post-2030: Insurance mitigants are only assumed to exist until 2030. Beyond this, full loss is assumed due to uncertainty around availability and affordability.
+
+
+
+
+---
+
+Scenario Inputs and Risk Mapping
+
+Risk outputs are sourced from Munich Re’s models based on combined RCP 8.5 and SSP5-85 scenarios.
+
+The models account for multiple hazard layers and apply geospatial overlays to determine “Extreme” risk classification.
+
+Properties are tagged based on their geographic overlap with “Extreme” zones across applicable hazard layers.
+
+
+
+---
+
+Regional Exposure Insights (Key Results)
+
+Exposure to “Extreme” Flood/Storm Risk:
+
+TW (100%), HK (68%), CN (48%), IN (22%), KR (11%)
+
+
+Exposure to “Extreme” Sea-Level Rise:
+
+UAE (35%), CN (9%), HK (4%), IN (1%)
+
+Other markets contribute <1% each
+
+
+
+
+---
+
+Let me know if you'd like this section as audio or if you want me to incorporate it into the full TDD document structure.
+Thanks for the clarification! Based on that, I’ll revise the relevant sentence in the Methodology section to clearly reflect this year's change in scenario input.
+
+🔄 Updated Line:
+
+> “Risk outputs are sourced from Munich Re’s models, which in last year’s assessment used RCP 8.5 scenarios. For this year’s assessment, a combined RCP 8.5 and SSP5-8.5 scenario is used to generate climate risk scores, representing both physical hazard severity and socio-economic amplification.”
+
+
+
+🧩 Full revised paragraph (from the Methodology section):
+
+> Scenario Inputs and Risk Mapping
+Risk outputs are sourced from Munich Re’s models. In the 2023 exercise, risk scores were based solely on the RCP 8.5 climate pathway. In the 2024 MST, climate scores are derived using a combination of RCP 8.5 and SSP5-8.5 scenarios. This enhanced approach captures both hazard severity and amplified socio-economic exposure, improving the accuracy of physical risk classification.
+The models integrate multiple hazard layers and apply geospatial overlays to determine “Extreme” risk classifications for mortgage properties.
+
+
+
+Let me know if you’d like a formal update of the full document, or a side note on where else this clarification might be needed.
+
