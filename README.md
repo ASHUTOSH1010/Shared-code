@@ -197,3 +197,148 @@ The models integrate multiple hazard layers and apply geospatial overlays to det
 
 Let me know if you’d like a formal update of the full document, or a side note on where else this clarification might be needed.
 
+
+
+
+
+
+
+
+Here is the refined and updated “Methodology – Stranded Assets Assessment” section, now incorporating:
+
+The clarification about Munich Re hazard scores using RCP 8.5 last year, and RCP 8.5 + SSP5-8.5 this year
+
+An expanded explanation of flood and storm sub-hazards
+
+
+
+---
+
+Section 4 – Methodology: Stranded Assets Assessment
+
+This section outlines the methodology used to estimate management adjustments related to stranded assets under physical climate risk scenarios. The focus is on properties exposed to “Extreme” risk levels under the RCP 8.5 climate pathway (2050 horizon) across flood, storm, and sea level rise hazards.
+
+
+---
+
+Definition of Stranded Assets
+
+Stranded assets are defined as properties expected to become uninhabitable or unusable due to climate-induced physical risks. These assets are assumed to experience a complete erosion in property value, necessitating full credit loss recognition for associated mortgage exposures.
+
+
+---
+
+Rationale for Adjustments
+
+Existing credit models, including PPI haircuts (e.g., from Munich Re), are applied at the portfolio level and may not capture tail-risk events such as total stranding of certain high-risk assets.
+
+The stranded assets methodology introduces additional management overlays to explicitly account for climate tail scenarios that go beyond average portfolio impacts.
+
+The adjustments are scoped strictly for current lending policies and tail physical climate scenarios.
+
+
+
+---
+
+Hazard Types Considered
+
+Only the most material physical hazards are included in the stranded asset assessment:
+
+Flood Risk, including:
+
+Pluvial flood (surface water flooding)
+
+Fluvial flood (river flooding)
+
+Coastal flood (including storm surge)
+
+Flash flood (from intense rainfall)
+
+
+Storm Risk, including:
+
+Tropical cyclones
+
+Extratropical cyclones
+
+Hailstorms
+
+Tornadoes
+
+Lightning
+
+
+Sea Level Rise (chronic hazard):
+This represents long-term inundation risk due to permanent sea encroachment.
+
+
+Exclusions:
+
+Heat stress is excluded as it is more relevant for transition risk rather than asset stranding.
+
+Precipitation stress is not separately modeled, as its effects are embedded within the flood and storm layers above.
+
+
+
+---
+
+Stranded Asset Criteria
+
+Properties are classified as stranded if they meet any of the following physical or structural vulnerability criteria:
+
+1. “Extreme” Risk Classification under climate stress scenarios by 2050
+
+
+2. Property Age: Built before 1970 (assumed to be less resilient to damage)
+
+
+3. Building Type: Bungalows, villas, semi-detached homes, or village-type structures (which face higher exposure and are costlier to reinstate)
+
+
+4. Flood Defense SOP < 20: Indicates lack of adequate protection
+
+
+5. Distance to Coast < 1km: Used as proxy for chronic sea-level risk
+
+
+6. Insurance Cover Ceases Post-2030: No insurance assumed beyond 2030 due to expected unavailability and affordability
+
+
+
+
+---
+
+Scenario Inputs and Risk Mapping
+
+Physical risk scores are sourced from Munich Re’s risk models, which classify geographic areas across multiple climate hazards.
+
+In the 2023 MST, hazard classifications were based solely on the RCP 8.5 pathway.
+
+For the 2024 MST, a combination of RCP 8.5 and SSP5-8.5 is used. This integrates not only physical hazard severity (RCP 8.5) but also socioeconomic vulnerability and exposure intensification (from SSP5-8.5), providing a more realistic representation of climate impact on properties.
+
+Geospatial overlays of these “Extreme” risk zones are used to tag affected properties.
+
+
+
+---
+
+Regional Exposure Insights (Key Results)
+
+Exposure to “Extreme” Flood/Storm Risk:
+
+TW (100%), HK (68%), CN (48%), IN (22%), KR (11%)
+
+
+Exposure to “Extreme” Sea-Level Rise:
+
+UAE (35%), CN (9%), HK (4%), IN (1%)
+
+All other markets <1%
+
+
+
+
+---
+
+Let me know if you'd like this section converted to audio or merged into the full TDD structure. I can also help format it for Word or PowerPoint depending on your reporting needs.
+
