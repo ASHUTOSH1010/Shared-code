@@ -1,71 +1,23 @@
-Great. Here's an updated version tailored for Technical Development Document (TDD) or DRR3-level documentation standards. It includes:
+Ok there is a separate section (section 9, image attached) on model monitoring where i have to mention something like - 'we will be monitoring all the assumptions parameters and limitations. We will do all the periodic review and monitoring. For limitations we will keep an eye on new market update , new science, new literature.' refer to the assumptions and limitations and help me write this section
 
-Clean narrative structure
 
-Traceable references to the data source
-
-Connection to how the phasing logic impacts your modelling (e.g. LGD, stage transitions)
-
-Ready-to-submit formatting
-
+Here’s a clear and professional draft you can use for your section on Model Monitoring of Assumptions and Limitations, tailored based on the contents of your images and referencing Section 9 appropriately:
 
 
 ---
 
-4.2.3 Phasing of Stranded Asset Impacts over the Projection Horizon
+Monitoring of Assumptions and Limitations
 
-The manifestation of climate-related losses, particularly from physical risks, is expected to escalate over time. This aligns with the broader scientific understanding that rising global temperatures will drive more frequent and severe climate hazards—such as extreme heat, inland flooding, and cyclones—which in turn increase the vulnerability and impairment risk of exposed assets.
+All key assumptions and limitations outlined in this document (refer to Tables 7 and 8) are subject to regular review and monitoring as part of the model governance and validation framework.
 
-Based on expert panel discussions, it was agreed that the more material losses from stranded assets—especially those driven by physical climate risks—are likely to occur in the latter years of the projection horizon. This assumption was incorporated into the loss modeling approach to better reflect the expected timing of climate-related stress events.
+We will actively monitor these assumptions—including climate scenario selection, mitigation thresholds, insurance assumptions, elevation proxies, and loss calculations—for relevance and accuracy based on emerging data, updated regulatory guidance, market developments, and advancements in climate science. Any significant changes in inputs, methodologies, or scenario families (e.g., changes to NGFS or IPCC scenario frameworks) will trigger a revalidation or update of model parameters through structured model risk processes.
 
-To phase these losses over time, we use a temperature-linked progression that mirrors the trajectory of global warming under a high-emissions pathway. Specifically, the distribution of losses is aligned with the cumulative rate of change in Global Mean Temperature (GMT).
+For model limitations, including data gaps related to property attributes or the exclusion of hazards such as heat stress and precipitation stress, ongoing efforts are in place to capture and integrate improved data as they become available. This includes reviewing academic literature, new scientific findings, regulatory expectations, and internal data enhancements. Where risks are currently excluded due to quantification challenges (e.g., heat stress not explicitly modeled), future integration will be considered as quantification methods evolve.
 
-The reference scenario used is from the Network for Greening the Financial System (NGFS) climate scenario database:
-
-Model: REMIND-MAgPIE 3.2-4.6
-
-Scenario: Current Policies
-
-Climate Model Emulator: MAGICC7.5.3
-
-Percentile: 50th (Median)
-
-Region: World
-
-
-This scenario broadly reflects the assumptions of a business-as-usual pathway comparable to RCP 8.5, where limited policy intervention results in steadily increasing warming throughout the century.
-
-The projected GMT increases over the modelling horizon are as follows:
-
-Year	2020	2025	2030	2035	2040	2045	2050
-
-GMT (K)	1.23	1.35	1.38	1.48	1.61	1.73	1.96
-Cumulative Change Share	2%	7%	14%	20%	26%	32%	
-Cumulative Fraction of Total	2%	9%	22%	42%	68%	100%	
-
-
-This temperature-linked phasing curve is used to allocate stranded asset losses across the projection years. In particular:
-
-Valuation adjustments for vulnerable or impaired exposures (e.g. LGD or stage 2/3 transitions) are scaled using the cumulative GMT share.
-
-The assumption is that climate-related credit impairments will not be linear but instead back-loaded, with increasing concentrations of loss appearing in later years, consistent with physical climate risk progression.
-
-
-> Footnote: The NGFS climate scenario data used for this exercise was sourced from the NGFS IIASA Scenario Explorer (downloaded prior to July 2025). The full scenario path is based on AR6 climate diagnostics using MAGICC7.5.3 median global temperature outputs.
-
-
+This monitoring activity will follow the broader principles described in Section 9: Model Monitoring, which details the DQM (Data Quality Management) oversight, use of tools like GAME, and specific watch points (e.g., GMT tracking for LGD, extrapolation refinements for PD). In line with this, we will continue to use sensitivity analysis, expert judgment, and user testing to ensure model robustness and alignment with intended risk outcomes.
 
 
 ---
 
-Let me know if you also want to:
-
-Integrate this logic into a LGD calculation or staging threshold
-
-Add a chart or visual of the temperature path + phasing weights
-
-Customize for submission in a governance pack or review memo
-
-
-Ready when you are.
+Let me know if you'd like a shorter version or one that fits better into a specific format (e.g., bullet points or compliance text).
 
