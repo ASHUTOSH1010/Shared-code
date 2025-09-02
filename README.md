@@ -1,47 +1,107 @@
-Ok there is a separate section (section 9, image attached) on model monitoring where i have to mention something like - 'we will be monitoring all the assumptions parameters and limitations. We will do all the periodic review and monitoring. For limitations we will keep an eye on new market update , new science, new literature.' refer to the assumptions and limitations and help me write this section
+I am not satisfied with format (not like what I shown you) and the coverage (not comprehensive and doesn't fully explain each part of code)
+
+Understood. To match the style, detail, and comprehensive nature of the code book format from the example images you provided earlier, the new code book for the Stranded Asset Analysis (SAA) will be:
+
+- Structured as a clear process workflow with numbered tasks/phases  
+- Include explicit descriptions of each code block or logical section  
+- List input files with their purpose  
+- State key variables, flags, and their meanings with precision  
+- Describe the step-by-step transformations and calculations in detail  
+- Document expected output files and summaries  
+- Use tables and bullet points for clarity and ease of reference  
+
+This will require a thorough dissection of your provided code into distinct steps and mapping each to functional descriptions, flag logic, and file dependencies.
+
+I will prepare this more refined and detailed code book in the exact style you showed, covering all significant parts of your SAA Python code.
+
+Please allow me a moment to produce this detailed and formatted code book draft based on your Python script and previous code book.
+Here is a comprehensive, structured, and clear code book for the Stranded Asset Analysis (SAA) physical climate risk stress testing code you provided. It follows the format and level of detail similar to the example code book screenshots you shared earlier.
+
+***
+
+# Stranded Asset Analysis (SAA) Code Book
+
+## 1. Process Overview for SAA  
+This process analyzes mortgage and property data relative to physical climate risks including flood, storm, sea level rise, and heat stress using portfolio-level exposure and property features. The aim is to identify potentially **stranded assets** exposed to adverse climate outcomes after considering mitigants such as flood defenses, property age, and type.
+
+## 2. Input Files and Data Sources
+
+| Input File                                   | Description                                                                                      |
+|----------------------------------------------|------------------------------------------------------------------------------------------------|
+| WRBQ424_RCP_SSP_retail_data.xlsx             | Retail mortgage portfolio data with climate risk exposure and scores by property/account        |
+| Consolidated prop data.xlsx                   | Property level details: country code, account ID, property type, year of property construction   |
+| Property_types.xlsx                           | Lookup containing `Grounded`, `Non-Grounded`, and `Others` property type classifications          |
+| HK_year_type_final.xlsx                       | Hong Kong-specific property type and year data to update merged property details in that region |
 
 
-Here’s a clear and professional draft you can use for your section on Model Monitoring of Assumptions and Limitations, tailored based on the contents of your images and referencing Section 9 appropriately:
+## 3. Key Process Steps and Code Logic
+
+### Task 1: Data Loading and Initial Cleaning  
+- Load retail mortgage data and create a copy (for backup).  
+- Rename columns to standardized names: `"base country"` → `"Country Code"`, `"address_id"` → `"Account Id"`.  
+- Filter mortgage data to retain climate risk variables and account identifiers needed for analysis.  
+
+### Task 2: Data Type Conversion and Account ID Cleaning  
+- Apply `convert_to_numeric()` to convert key measure columns from strings to numbers after cleaning (removing non-numeric chars).  
+- Define `clean_actid()` to standardize account IDs by:  
+  - Removing prefixes like `"RTL-XX-"` or `"RTL-"`.  
+  - Stripping suffixes after underscore `_`.  
+  - Removing all non-digit characters.  
+  - Special zero-stripping for Taiwan accounts.  
+- Apply `clean_actid` row-wise to generate cleaned account ID column `account_id_cl`.
+
+### Task 3: Reading and Cleaning Property Data  
+- Load property data and convert property year to numeric.  
+- Clean property types using regex cleaning logic in `clean_prop_type()`, normalizing strings, stripping unwanted characters, and spacing.  
+- Create a cleaned property type column `PROPERTY_TYPE_cl`.  
+- Remove duplicate properties by `(account_id_cl, Country Code)` keys to reduce redundancy.
+
+### Task 4: Property Type Classification  
+- Load property type classifications from `Property_types.xlsx` containing columns: `Grounded`, `Non-Grounded`, and `Others`.  
+- Clean these classifications similarly and generate lists for each category that are used to flag property types downstream.
+
+### Task 5: Merging Mortgage and Property Data  
+- Merge filtered mortgage data with cleaned property data on `(account_id_cl, Country Code)`.  
+- For Hong Kong (HK), update property age and type columns by merging with `HK_year_type_final.xlsx`.  
+- Replace property info for HK rows accordingly.
+
+### Task 6: Risk Mapping and Flag Creation  
+- Map numeric sea level rise risk values (`sea_level_rise_rcp85y2100_value`) to descriptive categories: `No Hazard`, `Low`, `Medium`, `High`, `Extreme`.  
+- Map river flood defended and undefended values to descriptive categories (`No Information`, `Low`, `Medium`, `High`, `Extreme`).  
+
+### Task 7: Stranded Asset Criteria and Flags  
+
+| Flag Name                           | Definition/Logic                                                                                     |
+|-----------------------------------|-----------------------------------------------------------------------------------------------------|
+| EXTREME_FLOOD_OR_STORM_wo_MITIGANTS | Flag=1 if flood or storm risk is `Extreme` before mitigation                                          |
+| STRANDED_FLOOD_STORM_SEA_RISE_wo_MITIGANTS | Flag=1 if extreme sea level rise or extreme flood/storm risk before mitigation                         |
+| FLOOD_DEFENSE_SOP_LTE20           | Flag=1 if flood defense SOP (Standard Operating Procedure) ≤ 20 (poor defense)                        |
+| Distance to coast zone2           | Categorizes properties as `Stranded` if distance to coast ≤ 1 km else `Non-Stranded`                   |
+| STRANDED_SEA_RISE_W_MITIGANTS     | Flag=1 if sea level rise risk is `Extreme` and property is within 1 km of coast after mitigation       |
+| PROPERTY_AGE_lt_1970              | Flag=1 if property age is before 1970 or age data unusable (acts as mitigant for acute flood/storm risk)|
+| STRANDED_PROPERTY_TYPE            | Flag=1 for grounded properties (villages, bungalows) or unrecognized types; else 0 for non-grounded    |
+| STRANDED_FLOOD_STORM_W_MITIGANTS  | Flag=1 if extreme flood or storm risk persists after mitigation including flood defense and property age |
+| STRANDED_FLOOD_STORM_W_MITIGANTS_incl_PropType | As above but including property type filter                                                         |
+| STRANDED_FINAL_incl_PropType      | Final stranded asset flag combining flood, storm, sea level rise risks and mitigants                  |
+
+### Task 8: Summary and Sensitivity Analysis  
+- Aggregate outstanding USD exposure by country using pivot tables.  
+- Conduct sensitivity analysis of stranded asset exposure relative to varying flood defense SOP thresholds (0, 20, 50, 100).  
+- Conduct sensitivity analysis relative to distance to coast thresholds (100m, 250m, 500m, 750m, 1000m).  
 
 
----
-
-Monitoring of Assumptions and Limitations
-
-All key assumptions and limitations outlined in this document (refer to Tables 7 and 8) are subject to regular review and monitoring as part of the model governance and validation framework.
-
-We will actively monitor these assumptions—including climate scenario selection, mitigation thresholds, insurance assumptions, elevation proxies, and loss calculations—for relevance and accuracy based on emerging data, updated regulatory guidance, market developments, and advancements in climate science. Any significant changes in inputs, methodologies, or scenario families (e.g., changes to NGFS or IPCC scenario frameworks) will trigger a revalidation or update of model parameters through structured model risk processes.
-
-For model limitations, including data gaps related to property attributes or the exclusion of hazards such as heat stress and precipitation stress, ongoing efforts are in place to capture and integrate improved data as they become available. This includes reviewing academic literature, new scientific findings, regulatory expectations, and internal data enhancements. Where risks are currently excluded due to quantification challenges (e.g., heat stress not explicitly modeled), future integration will be considered as quantification methods evolve.
-
-This monitoring activity will follow the broader principles described in Section 9: Model Monitoring, which details the DQM (Data Quality Management) oversight, use of tools like GAME, and specific watch points (e.g., GMT tracking for LGD, extrapolation refinements for PD). In line with this, we will continue to use sensitivity analysis, expert judgment, and user testing to ensure model robustness and alignment with intended risk outcomes.
+## 4. Output Files and Data  
+- Detailed property-level dataset with stranded flags and descriptive columns.  
+- Pivot summary tables of outstanding exposure by country, showing stranded amounts under various mitigant thresholds.
 
 
----
-
-Let me know if you'd like a shorter version or one that fits better into a specific format (e.g., bullet points or compliance text).
-Sure! Here's a table in the same format as the images you provided. It covers monitoring of assumptions and limitations in line with Section 9: Model Monitoring, and uses the same structure (Item, Description, Materiality/Impact, Monitoring Approach):
+## 5. Code Files and Scripts  
+- This entire process is encapsulated in a single or notebook Python script managing input loading, cleaning, transformation, risk flagging, and output summaries.
 
 
----
+***
 
-Table X: Monitoring of Assumptions and Limitations
+This draft provides a stepwise clear description of each code part with detailed flag logic and file purpose to match your example code book style and thoroughness. Kindly confirm or specify if you want sections expanded with even more code-level detail or tabular breakdowns.
 
-Item	Description	Materiality / Impact	Monitoring Approach
-
-Scenario Selection (RCP 8.5 / SSP5 8.5)	Use of high-end scenario to represent a conservative, worst-case trajectory	Leads to higher projected climate-related losses and conservative stranded asset estimates	Will be periodically reviewed in line with evolving NGFS scenario guidance and climate science. Adjustments will be made if new scenario pathways or consensus best-practices emerge.
-Mitigant Thresholds	Thresholds (e.g., SOP levels, property age, distance to coast) define when assets are considered stranded	Affects number of stranded properties and magnitude of losses	Will be reviewed annually via expert workshops and sensitivity testing. Market-level data improvements or new regulatory inputs will inform recalibration.
-Phase-out of Insurance Benefits Post-2030	Assumes insurance becomes unavailable after 2030	Significantly increases projected losses and reduces recoverable values	Monitoring of regulatory and market developments (e.g., HKMA, insurance trends) will continue. Review to be triggered upon publication of new guidance or data on market insurability.
-Use of Property Type as Elevation Proxy	Uses property type as proxy for floor elevation	May misclassify flood exposure in some cases	Will be re-evaluated as granular elevation data becomes available. Coordination with property data providers and local market teams to validate assumptions.
-Full Value Erosion Assumption	Entire outstanding value is assumed lost once property is stranded	Produces a conservative maximum loss estimate	Ongoing review against emerging damage data and loss modeling practices. If partial damage metrics become viable, methodology may be adjusted accordingly.
-Limited Property Attribute Data	Incomplete availability of granular data like floor level or exposure	Affects precision of stranded classification and risk estimates	Market outreach and data collection initiatives are underway. Periodic updates to reflect any progress in data availability or vendor offerings.
-Exclusion of Heat and Precipitation Stress	Heat and precipitation stress are not directly used in full-value stranding logic	May underestimate risks in regions where these perils dominate	Climate risk science developments and bank-wide climate integration efforts will be monitored. These perils will be incorporated when impact pathways and data reliability reach sufficient maturity.
-DQM Monitoring (Section 9)	Covers use of global mean temperature (GMT) for LGD deterioration and PD extrapolation	Impacts climate calibration for LGD and treatment of non-CEM scorecard clients	Section 9 processes (GAME and validation use cases) will continue to track assumptions and inputs. Periodic updates will be made in response to emerging science (e.g., using regional temperatures) or new model developments.
-
-
-
----
-
-Let me know if you'd like this in Word or Excel format or want to add a section for owner/responsibility or review frequency.
-
-
+Citations:
+[1] saa-code.pdf https://ppl-ai-file-upload.s3.amazonaws.com/web/direct-files/attachments/78100584/c5deb127-668e-435e-b408-7c0975543dce/saa-code.pdf
