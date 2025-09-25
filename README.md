@@ -341,101 +341,147 @@ import pandas as pd
 import numpy as np
 
 def hierarchical_merge(curr_expanded, mst_trends, key_sets):
-    """Try merging with progressively reduced key sets."""
-    merged = None
-    unmatched = curr_expanded.copy()
+    """
+    Try merging with progressively reduced key sets.
+    Returns a DataFrame where MST columns are merged in at the most granular level available.
+    This version is robust to pandas suffixes (_x/_y) and missing keys.
+    """
+    orig_cols = list(curr_expanded.columns)
+    merged_parts = []
+    unmatched = curr_expanded.copy().reset_index(drop=True)
 
     for keys in key_sets:
         if unmatched.empty:
             break
 
-        m = pd.merge(unmatched, mst_trends, on=keys, how='left', indicator=True)
+        # Only keep keys that actually exist in both dfs for this iteration
+        available_keys = [k for k in keys if (k in unmatched.columns) and (k in mst_trends.columns)]
+        if not available_keys:
+            continue
 
-        matched = m[m['_merge']!='left_only'].copy()
-        unmatched = m[m['_merge']=='left_only'][curr_expanded.columns]  # keep original cols for next iteration
+        m = pd.merge(unmatched, mst_trends, on=available_keys, how='left', indicator=True)
+        matched = m[m['_merge'] != 'left_only'].copy().reset_index(drop=True)
+        left_only = m[m['_merge'] == 'left_only'].copy().reset_index(drop=True)
 
-        if merged is None:
-            merged = matched
+        if not matched.empty:
+            merged_parts.append(matched)
+
+        # rebuild unmatched using original curr_expanded column names (handle suffixes)
+        if left_only.empty:
+            unmatched = left_only.iloc[0:0]
         else:
-            merged = pd.concat([merged, matched], ignore_index=True)
+            new_un = pd.DataFrame()
+            for col in orig_cols:
+                if col in left_only.columns:
+                    new_un[col] = left_only[col].values
+                elif f"{col}_x" in left_only.columns:
+                    new_un[col] = left_only[f"{col}_x"].values
+                elif f"{col}_y" in left_only.columns:
+                    new_un[col] = left_only[f"{col}_y"].values
+                else:
+                    new_un[col] = np.nan
+            unmatched = new_un.reset_index(drop=True)
 
-    # Still unmatched after all merges: fill MST columns with NaN
+    # combine matched parts
+    if merged_parts:
+        merged_df = pd.concat(merged_parts, ignore_index=True, sort=False)
+    else:
+        merged_df = pd.DataFrame(columns=orig_cols)
+
+    # ensure original curr columns exist in merged_df (pull from _x/_y if necessary)
+    for col in orig_cols:
+        if col not in merged_df.columns:
+            if f"{col}_x" in merged_df.columns:
+                merged_df[col] = merged_df[f"{col}_x"]
+            elif f"{col}_y" in merged_df.columns:
+                merged_df[col] = merged_df[f"{col}_y"]
+            else:
+                merged_df[col] = np.nan
+
+    # append any still-unmatched rows, adding MST columns as NaN
     if not unmatched.empty:
-        unmatched_mst_cols = [c for c in mst_trends.columns if c not in curr_expanded.columns]
-        for c in unmatched_mst_cols:
-            unmatched[c] = np.nan
-        merged = pd.concat([merged, unmatched], ignore_index=True)
+        for c in mst_trends.columns:
+            if c not in unmatched.columns and c not in orig_cols:
+                unmatched[c] = np.nan
+        merged_df = pd.concat([merged_df, unmatched], ignore_index=True, sort=False)
 
-    return merged
+    return merged_df
+
 
 def fn_WRB_final_metrics_no_scalars(df):
-    """Compute projections, Year-0 override, cumulative LI."""
+    """
+    Project EAD/ECL using MST R_* directly, override Y0 with actuals,
+    and compute cumulative loan impairment CUMM_LI_Yi = max(0, ECL_Yi - ECL_Y0).
+    """
     df = df.copy()
 
-    # --- Project exposures and ECL ---
-    df['EAD_DF_Yi'] = df['EAD_IFRS'] * df['R_EAD_DF_PC']
-    df['EAD_NDF_Yi'] = df['EAD_IFRS'] - df['EAD_DF_Yi']
-    df['ECL_DF_Yi'] = df['EAD_DF_Yi'] * df['R_ECL_DF_PC']
-    df['ECL_NDF_Yi'] = df['EAD_NDF_Yi'] * df['R_ECL_NDF_PC']
+    # ensure MST ratio columns exist (avoid KeyError)
+    for c in ['R_EAD_DF_PC','R_ECL_DF_PC','R_ECL_NDF_PC']:
+        if c not in df.columns:
+            df[c] = np.nan
+
+    # projections
+    df['EAD_DF_Yi'] = pd.to_numeric(df.get('EAD_IFRS', 0)).fillna(0.0) * df['R_EAD_DF_PC'].fillna(0.0)
+    df['EAD_NDF_Yi'] = pd.to_numeric(df.get('EAD_IFRS', 0)).fillna(0.0) - df['EAD_DF_Yi']
+    df['ECL_DF_Yi']  = df['EAD_DF_Yi'] * df['R_ECL_DF_PC'].fillna(0.0)
+    df['ECL_NDF_Yi'] = df['EAD_NDF_Yi'] * df['R_ECL_NDF_PC'].fillna(0.0)
     df['ECL_Total_Yi'] = df['ECL_DF_Yi'] + df['ECL_NDF_Yi']
 
-    # --- Force Year 0 to actuals ---
-    mask0 = df['projection_period']==0
-    df.loc[mask0,'EAD_DF_Yi']    = df.loc[mask0,'EAD_IFRS_DF']
-    df.loc[mask0,'EAD_NDF_Yi']   = df.loc[mask0,'EAD_IFRS_NDF']
-    df.loc[mask0,'ECL_DF_Yi']    = df.loc[mask0,'ECL_DF']
-    df.loc[mask0,'ECL_NDF_Yi']   = df.loc[mask0,'ECL_NDF']
-    df.loc[mask0,'ECL_Total_Yi'] = df.loc[mask0,'ECL_DF'] + df.loc[mask0,'ECL_NDF']
+    # Force Year-0 to actuals (if current values present)
+    mask0 = df['projection_period'] == 0
+    if 'EAD_IFRS_DF' in df.columns:
+        df.loc[mask0, 'EAD_DF_Yi'] = df.loc[mask0, 'EAD_IFRS_DF']
+    if 'EAD_IFRS_NDF' in df.columns:
+        df.loc[mask0, 'EAD_NDF_Yi'] = df.loc[mask0, 'EAD_IFRS_NDF']
+    if 'ECL_DF' in df.columns:
+        df.loc[mask0, 'ECL_DF_Yi'] = df.loc[mask0, 'ECL_DF']
+    if 'ECL_NDF' in df.columns:
+        df.loc[mask0, 'ECL_NDF_Yi'] = df.loc[mask0, 'ECL_NDF']
+    # set ECL_Total_Yi at Y0 as sum of actual ECLs if present
+    df.loc[mask0, 'ECL_Total_Yi'] = df.loc[mask0].get('ECL_DF', 0).fillna(0) + df.loc[mask0].get('ECL_NDF', 0).fillna(0)
 
-    # --- Compute baseline ECL_Total at Year 0 per portfolio ---
+    # baseline Y0 ECL per portfolio
     group_cols = ['approach','entity','country','product','fin_business_unit','Scenario']
     baseline = df.loc[mask0, group_cols + ['ECL_Total_Yi']].rename(columns={'ECL_Total_Yi':'ECL_Total_Y0'})
+    df = pd.merge(df, baseline, on=group_cols, how='left')
 
-    # merge baseline back
-    df = df.merge(baseline, on=group_cols, how='left')
-
-    # --- Compute cumulative LI ---
+    # cumulative loan impairment (non-negative)
     df['CUMM_LI_Yi'] = (df['ECL_Total_Yi'] - df['ECL_Total_Y0']).clip(lower=0)
 
     return df
 
-def run_projection(curr_full, mst_trends):
-    """Full pipeline from current + MST → projected metrics."""
 
-    # Step 1: get all projection periods from MST
+def run_projection(curr_full, mst_trends, key_sets=None):
+    """
+    Full pipeline:
+      - cross-join current rows with all projection_periods from MST,
+      - hierarchical_merge on key_sets (if None, default levels used),
+      - rename any _x columns back to original names,
+      - compute projections + CUMM_LI.
+    """
+    if key_sets is None:
+        key_sets = [
+            ['approach','entity','country','product','fin_business_unit','Scenario','projection_period'],
+            ['approach','entity','country','product','Scenario','projection_period'],
+            ['approach','entity','country','Scenario','projection_period']
+        ]
+
     proj_periods = mst_trends['projection_period'].unique()
     proj_periods_df = pd.DataFrame({'projection_period': proj_periods})
 
-    # Step 2: cross join current rows with all projection periods
-    curr_full = curr_full.copy()
-    curr_full['_tmpkey'] = 1
+    cf = curr_full.copy().reset_index(drop=True)
+    cf['_tmpkey'] = 1
     proj_periods_df['_tmpkey'] = 1
-    curr_expanded = pd.merge(curr_full, proj_periods_df, on='_tmpkey').drop('_tmpkey', axis=1)
+    curr_expanded = pd.merge(cf, proj_periods_df, on='_tmpkey').drop('_tmpkey', axis=1)
 
-    # Step 3: hierarchical merge
-    key_sets = [
-        ['approach','entity','country','product','fin_business_unit','Scenario','projection_period'],
-        ['approach','entity','country','product','Scenario','projection_period'],
-        ['approach','entity','country','Scenario','projection_period']
-    ]
     merged = hierarchical_merge(curr_expanded, mst_trends, key_sets)
 
-    # Step 4: rename current columns back to standard names
-    merged2 = merged.rename(columns={
-        'EAD_IFRS_x':'EAD_IFRS',
-        'EAD_IFRS_NDF_x':'EAD_IFRS_NDF',
-        'EAD_IFRS_DF_x':'EAD_IFRS_DF',
-        'ECL_NDF_x':'ECL_NDF',
-        'ECL_DF_x':'ECL_DF'
-    })
+    # rename any {col}_x back to col (current values)
+    rename_map = {}
+    for base in ['EAD_IFRS','EAD_IFRS_NDF','EAD_IFRS_DF','ECL_NDF','ECL_DF']:
+        if f"{base}_x" in merged.columns and base not in merged.columns:
+            rename_map[f"{base}_x"] = base
+    merged2 = merged.rename(columns=rename_map)
 
-    # Step 5: run projections + cumulative LI
     projected = fn_WRB_final_metrics_no_scalars(merged2)
-
     return projected
-
-    projected = run_projection(curr_full, mst_trends)
-
-# See your results
-cols = ['Scenario','projection_period','EAD_DF_Yi','EAD_NDF_Yi','ECL_DF_Yi','ECL_NDF_Yi','ECL_Total_Yi','CUMM_LI_Yi']
-print(projected[cols].head(20))
