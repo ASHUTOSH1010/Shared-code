@@ -485,3 +485,224 @@ def run_projection(curr_full, mst_trends, key_sets=None):
 
     projected = fn_WRB_final_metrics_no_scalars(merged2)
     return projected
+
+
+
+
+
+
+
+mmmmmmmmjjjjjjjjjjjjyyyyyyyyyhyuuuujuu
+
+import pandas as pd
+import numpy as np
+
+# ---------- STEP 1: Load data ----------
+
+def load_data(curr_file, mst_file, sheet_curr=None, sheet_mst=None):
+    """
+    Load current exposures and MST ratios from CSV or Excel.
+    """
+    # detect file type
+    if curr_file.endswith('.csv'):
+        curr_full = pd.read_csv(curr_file)
+    else:
+        curr_full = pd.read_excel(curr_file, sheet_name=sheet_curr)
+
+    if mst_file.endswith('.csv'):
+        mst_trends = pd.read_csv(mst_file)
+    else:
+        mst_trends = pd.read_excel(mst_file, sheet_name=sheet_mst)
+
+    # strip column names
+    curr_full.columns = curr_full.columns.str.strip()
+    mst_trends.columns = mst_trends.columns.str.strip()
+
+    return curr_full, mst_trends
+
+
+# ---------- STEP 2: Hierarchical merge helper ----------
+
+def hierarchical_merge(curr_expanded, mst_trends, key_sets):
+    """
+    Merge curr_expanded with mst_trends using progressively reduced key sets.
+    """
+    orig_cols = list(curr_expanded.columns)
+    merged_parts = []
+    unmatched = curr_expanded.copy().reset_index(drop=True)
+
+    for keys in key_sets:
+        if unmatched.empty:
+            break
+
+        # Only keys present in both
+        available_keys = [k for k in keys if (k in unmatched.columns) and (k in mst_trends.columns)]
+        if not available_keys:
+            continue
+
+        m = pd.merge(unmatched, mst_trends, on=available_keys, how='left', indicator=True)
+        matched = m[m['_merge'] != 'left_only'].copy().reset_index(drop=True)
+        left_only = m[m['_merge'] == 'left_only'].copy().reset_index(drop=True)
+
+        if not matched.empty:
+            merged_parts.append(matched)
+
+        if left_only.empty:
+            unmatched = left_only.iloc[0:0]
+        else:
+            new_un = pd.DataFrame()
+            for col in orig_cols:
+                if col in left_only.columns:
+                    new_un[col] = left_only[col].values
+                elif f"{col}_x" in left_only.columns:
+                    new_un[col] = left_only[f"{col}_x"].values
+                elif f"{col}_y" in left_only.columns:
+                    new_un[col] = left_only[f"{col}_y"].values
+                else:
+                    new_un[col] = np.nan
+            unmatched = new_un.reset_index(drop=True)
+
+    if merged_parts:
+        merged_df = pd.concat(merged_parts, ignore_index=True, sort=False)
+    else:
+        merged_df = pd.DataFrame(columns=orig_cols)
+
+    # ensure original curr columns exist in merged_df
+    for col in orig_cols:
+        if col not in merged_df.columns:
+            if f"{col}_x" in merged_df.columns:
+                merged_df[col] = merged_df[f"{col}_x"]
+            elif f"{col}_y" in merged_df.columns:
+                merged_df[col] = merged_df[f"{col}_y"]
+            else:
+                merged_df[col] = np.nan
+
+    # append any unmatched with MST columns as NaN
+    if not unmatched.empty:
+        for c in mst_trends.columns:
+            if c not in unmatched.columns and c not in orig_cols:
+                unmatched[c] = np.nan
+        merged_df = pd.concat([merged_df, unmatched], ignore_index=True, sort=False)
+
+    return merged_df
+
+
+# ---------- STEP 3: Projection metrics ----------
+
+def fn_WRB_final_metrics_no_scalars(df):
+    """
+    Project EAD/ECL using MST ratios, override Y0, compute cumulative loan impairment.
+    """
+    df = df.copy()
+    for c in ['R_EAD_DF_PC','R_ECL_DF_PC','R_ECL_NDF_PC']:
+        if c not in df.columns:
+            df[c] = np.nan
+
+    df['EAD_DF_Yi'] = pd.to_numeric(df.get('EAD_IFRS', 0)).fillna(0.0) * df['R_EAD_DF_PC'].fillna(0.0)
+    df['EAD_NDF_Yi'] = pd.to_numeric(df.get('EAD_IFRS', 0)).fillna(0.0) - df['EAD_DF_Yi']
+    df['ECL_DF_Yi']  = df['EAD_DF_Yi'] * df['R_ECL_DF_PC'].fillna(0.0)
+    df['ECL_NDF_Yi'] = df['EAD_NDF_Yi'] * df['R_ECL_NDF_PC'].fillna(0.0)
+    df['ECL_Total_Yi'] = df['ECL_DF_Yi'] + df['ECL_NDF_Yi']
+
+    mask0 = df['projection_period'] == 0
+    if 'EAD_IFRS_DF' in df.columns:
+        df.loc[mask0, 'EAD_DF_Yi'] = df.loc[mask0, 'EAD_IFRS_DF']
+    if 'EAD_IFRS_NDF' in df.columns:
+        df.loc[mask0, 'EAD_NDF_Yi'] = df.loc[mask0, 'EAD_IFRS_NDF']
+    if 'ECL_DF' in df.columns:
+        df.loc[mask0, 'ECL_DF_Yi'] = df.loc[mask0, 'ECL_DF']
+    if 'ECL_NDF' in df.columns:
+        df.loc[mask0, 'ECL_NDF_Yi'] = df.loc[mask0, 'ECL_NDF']
+    df.loc[mask0, 'ECL_Total_Yi'] = df.loc[mask0].get('ECL_DF',0).fillna(0) + df.loc[mask0].get('ECL_NDF',0).fillna(0)
+
+    group_cols = ['approach','entity','country','product','fin_business_unit','Scenario']
+    baseline = df.loc[mask0, group_cols + ['ECL_Total_Yi']].rename(columns={'ECL_Total_Yi':'ECL_Total_Y0'})
+    df = pd.merge(df, baseline, on=group_cols, how='left')
+    df['CUMM_LI_Yi'] = (df['ECL_Total_Yi'] - df['ECL_Total_Y0']).clip(lower=0)
+
+    return df
+
+
+# ---------- STEP 4: Main pipeline ----------
+
+def run_projection(curr_full, mst_trends):
+    """
+    Full pipeline from current exposures + MST to projected metrics.
+    """
+    key_sets = [
+        ['approach','entity','country','product','fin_business_unit','Scenario','projection_period'],
+        ['approach','entity','country','product','Scenario','projection_period'],
+        ['approach','entity','country','Scenario','projection_period']
+    ]
+
+    proj_periods = mst_trends['projection_period'].unique()
+    proj_periods_df = pd.DataFrame({'projection_period': proj_periods})
+
+    cf = curr_full.copy().reset_index(drop=True)
+    cf['_tmpkey'] = 1
+    proj_periods_df['_tmpkey'] = 1
+    curr_expanded = pd.merge(cf, proj_periods_df, on='_tmpkey').drop('_tmpkey', axis=1)
+
+    merged = hierarchical_merge(curr_expanded, mst_trends, key_sets)
+
+    # rename any {col}_x back to col (current values)
+    rename_map = {}
+    for base in ['EAD_IFRS','EAD_IFRS_NDF','EAD_IFRS_DF','ECL_NDF','ECL_DF']:
+        if f"{base}_x" in merged.columns and base not in merged.columns:
+            rename_map[f"{base}_x"] = base
+    merged2 = merged.rename(columns=rename_map)
+
+    projected = fn_WRB_final_metrics_no_scalars(merged2)
+    return projected
+
+
+# ---------- STEP 5: Generate pivots ----------
+
+def create_pivots(df):
+    """
+    Example pivot: total ECL per Scenario/projection_period.
+    """
+    pivot_ecl = pd.pivot_table(
+        df,
+        values='ECL_Total_Yi',
+        index=['Scenario'],
+        columns=['projection_period'],
+        aggfunc='sum',
+        fill_value=0
+    )
+
+    pivot_li = pd.pivot_table(
+        df,
+        values='CUMM_LI_Yi',
+        index=['Scenario'],
+        columns=['projection_period'],
+        aggfunc='sum',
+        fill_value=0
+    )
+
+    return pivot_ecl, pivot_li
+
+
+# ---------- STEP 6: Main script runner ----------
+
+if __name__ == "__main__":
+    # Adjust file paths as needed:
+    curr_file = "current_exposures.csv"  # or .xlsx
+    mst_file = "mst_ratios.csv"          # or .xlsx
+
+    curr_full, mst_trends = load_data(curr_file, mst_file)
+
+    # run pipeline
+    projected = run_projection(curr_full, mst_trends)
+
+    # export full projected data
+    projected.to_csv("projected_output.csv", index=False)
+
+    # pivots
+    pivot_ecl, pivot_li = create_pivots(projected)
+    pivot_ecl.to_csv("pivot_total_ecl.csv")
+    pivot_li.to_csv("pivot_cumm_li.csv")
+
+    print("Projection complete.")
+    print("ECL Pivot:\n", pivot_ecl)
+    print("CUMM LI Pivot:\n", pivot_li)
