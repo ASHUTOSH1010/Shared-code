@@ -325,3 +325,117 @@ def main(global_inputs_path=GLOBAL_INPUTS_CSV):
 if __name__ == "__main__":
     # Run main (adjust path to your global_inputs.csv if needed)
     main()
+
+
+
+
+
+
+
+
+
+
+
+nnnnnmnnnnnnnnnnn
+import pandas as pd
+import numpy as np
+
+def hierarchical_merge(curr_expanded, mst_trends, key_sets):
+    """Try merging with progressively reduced key sets."""
+    merged = None
+    unmatched = curr_expanded.copy()
+
+    for keys in key_sets:
+        if unmatched.empty:
+            break
+
+        m = pd.merge(unmatched, mst_trends, on=keys, how='left', indicator=True)
+
+        matched = m[m['_merge']!='left_only'].copy()
+        unmatched = m[m['_merge']=='left_only'][curr_expanded.columns]  # keep original cols for next iteration
+
+        if merged is None:
+            merged = matched
+        else:
+            merged = pd.concat([merged, matched], ignore_index=True)
+
+    # Still unmatched after all merges: fill MST columns with NaN
+    if not unmatched.empty:
+        unmatched_mst_cols = [c for c in mst_trends.columns if c not in curr_expanded.columns]
+        for c in unmatched_mst_cols:
+            unmatched[c] = np.nan
+        merged = pd.concat([merged, unmatched], ignore_index=True)
+
+    return merged
+
+def fn_WRB_final_metrics_no_scalars(df):
+    """Compute projections, Year-0 override, cumulative LI."""
+    df = df.copy()
+
+    # --- Project exposures and ECL ---
+    df['EAD_DF_Yi'] = df['EAD_IFRS'] * df['R_EAD_DF_PC']
+    df['EAD_NDF_Yi'] = df['EAD_IFRS'] - df['EAD_DF_Yi']
+    df['ECL_DF_Yi'] = df['EAD_DF_Yi'] * df['R_ECL_DF_PC']
+    df['ECL_NDF_Yi'] = df['EAD_NDF_Yi'] * df['R_ECL_NDF_PC']
+    df['ECL_Total_Yi'] = df['ECL_DF_Yi'] + df['ECL_NDF_Yi']
+
+    # --- Force Year 0 to actuals ---
+    mask0 = df['projection_period']==0
+    df.loc[mask0,'EAD_DF_Yi']    = df.loc[mask0,'EAD_IFRS_DF']
+    df.loc[mask0,'EAD_NDF_Yi']   = df.loc[mask0,'EAD_IFRS_NDF']
+    df.loc[mask0,'ECL_DF_Yi']    = df.loc[mask0,'ECL_DF']
+    df.loc[mask0,'ECL_NDF_Yi']   = df.loc[mask0,'ECL_NDF']
+    df.loc[mask0,'ECL_Total_Yi'] = df.loc[mask0,'ECL_DF'] + df.loc[mask0,'ECL_NDF']
+
+    # --- Compute baseline ECL_Total at Year 0 per portfolio ---
+    group_cols = ['approach','entity','country','product','fin_business_unit','Scenario']
+    baseline = df.loc[mask0, group_cols + ['ECL_Total_Yi']].rename(columns={'ECL_Total_Yi':'ECL_Total_Y0'})
+
+    # merge baseline back
+    df = df.merge(baseline, on=group_cols, how='left')
+
+    # --- Compute cumulative LI ---
+    df['CUMM_LI_Yi'] = (df['ECL_Total_Yi'] - df['ECL_Total_Y0']).clip(lower=0)
+
+    return df
+
+def run_projection(curr_full, mst_trends):
+    """Full pipeline from current + MST → projected metrics."""
+
+    # Step 1: get all projection periods from MST
+    proj_periods = mst_trends['projection_period'].unique()
+    proj_periods_df = pd.DataFrame({'projection_period': proj_periods})
+
+    # Step 2: cross join current rows with all projection periods
+    curr_full = curr_full.copy()
+    curr_full['_tmpkey'] = 1
+    proj_periods_df['_tmpkey'] = 1
+    curr_expanded = pd.merge(curr_full, proj_periods_df, on='_tmpkey').drop('_tmpkey', axis=1)
+
+    # Step 3: hierarchical merge
+    key_sets = [
+        ['approach','entity','country','product','fin_business_unit','Scenario','projection_period'],
+        ['approach','entity','country','product','Scenario','projection_period'],
+        ['approach','entity','country','Scenario','projection_period']
+    ]
+    merged = hierarchical_merge(curr_expanded, mst_trends, key_sets)
+
+    # Step 4: rename current columns back to standard names
+    merged2 = merged.rename(columns={
+        'EAD_IFRS_x':'EAD_IFRS',
+        'EAD_IFRS_NDF_x':'EAD_IFRS_NDF',
+        'EAD_IFRS_DF_x':'EAD_IFRS_DF',
+        'ECL_NDF_x':'ECL_NDF',
+        'ECL_DF_x':'ECL_DF'
+    })
+
+    # Step 5: run projections + cumulative LI
+    projected = fn_WRB_final_metrics_no_scalars(merged2)
+
+    return projected
+
+    projected = run_projection(curr_full, mst_trends)
+
+# See your results
+cols = ['Scenario','projection_period','EAD_DF_Yi','EAD_NDF_Yi','ECL_DF_Yi','ECL_NDF_Yi','ECL_Total_Yi','CUMM_LI_Yi']
+print(projected[cols].head(20))
