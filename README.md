@@ -1,3 +1,39 @@
+Got it — here’s a friendlier, more informal version you can send:
+
+
+---
+
+Subject: Quick update before I head on leave
+
+Hi 
+
+Just wanted to keep everyone in the loop as I’ll have to head on leave unexpectedly. Over the past week or so I’ve been working on enhancing the quarterly scenario analysis scripts. Here’s where things stand:
+
+1. Changed scalar calculation logic from ECL ratios to simpler EAD ratios – done
+
+
+2. Added functionality to merge files on all keys first, then try a less-strict merge on a reduced set – in progress
+
+
+3. Added functionality to include stranded asset results into the main code – done
+
+
+4. Testing and validating results with Excel workings – in progress
+
+
+
+All my current work and code are here: [insert location link/path].
+
+Let me know if you’d like me to run through anything before I go.
+
+Cheers,
+[Your Name]
+
+
+---
+
+Want me to make it even shorter/snappier (like a quick Slack/Teams message style) or keep it as an email?
+
 
 """
 wrb_scenario_analysis_simple.py
