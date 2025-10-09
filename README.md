@@ -1,73 +1,46 @@
 import pandas as pd
+import re
 
-# --- 1️⃣ Load your data ---
+# --- 1️⃣ Read and clean column names ---
 df = pd.read_excel("stress_data.xlsx", sheet_name="Sheet1")
+df.columns = df.columns.str.strip()  # remove extra spaces
 
-# --- 2️⃣ Define dimension columns ---
 dimension_cols = [
     "Scenario", "APPROACH", "ENTITY", "COUNTRY", "PRODUCT", "FIN_BUSINESS_UNIT"
 ]
 
-# --- 3️⃣ Projection periods ---
-years = ["Y0", "Y1", "Y6", "Y11", "Y16", "Y21", "Y26"]
+# --- 2️⃣ Extract all projection years dynamically ---
+years = sorted(set(re.findall(r"Y\d+", " ".join(df.columns))))
 
-# --- 4️⃣ Melt each measure into long format ---
+# --- 3️⃣ Define a helper function to melt each metric safely ---
+def melt_metric(df, prefix, new_col):
+    cols = [c for c in df.columns if c.startswith(prefix)]
+    melted = df.melt(id_vars=dimension_cols, value_vars=cols,
+                     var_name="Metric", value_name=new_col)
+    melted["YEAR"] = melted["Metric"].str.extract(r"(Y\d+)")
+    melted.drop(columns="Metric", inplace=True)
+    return melted
 
-# EAD IFRS DF
-ead_ifrs = df.melt(
-    id_vars=dimension_cols,
-    value_vars=[f"EAD IFRS DF {y}" for y in years],
-    var_name="Metric",
-    value_name="EAD_IFRS_DF"
-)
-ead_ifrs["YEAR"] = ead_ifrs["Metric"].str.extract(r"Y(\d+)")
-ead_ifrs.drop(columns="Metric", inplace=True)
+# --- 4️⃣ Melt each measure ---
+ead_ifrs = melt_metric(df, "EAD IFRS DF", "EAD_IFRS_DF")
+ecl_ndf = melt_metric(df, "ECL NDF", "ECL_NDF")
+ecl_df = melt_metric(df, "ECL DF", "ECL_DF")
+ecl_total = melt_metric(df, "ECL ", "ECL_TOTAL")  # note space to avoid ECL DF/NDF confusion
 
-# ECL NDF
-ecl_ndf = df.melt(
-    id_vars=dimension_cols,
-    value_vars=[f"ECL NDF Y{y[1:]}" for y in years],
-    var_name="Metric",
-    value_name="ECL_NDF"
-)
-ecl_ndf["YEAR"] = ecl_ndf["Metric"].str.extract(r"Y(\d+)")
-ecl_ndf.drop(columns="Metric", inplace=True)
-
-# ECL DF
-ecl_df = df.melt(
-    id_vars=dimension_cols,
-    value_vars=[f"ECL DF Y{y[1:]}" for y in years],
-    var_name="Metric",
-    value_name="ECL_DF"
-)
-ecl_df["YEAR"] = ecl_df["Metric"].str.extract(r"Y(\d+)")
-ecl_df.drop(columns="Metric", inplace=True)
-
-# ECL TOTAL (already present)
-ecl_total = df.melt(
-    id_vars=dimension_cols,
-    value_vars=[f"ECL {y}" for y in years],
-    var_name="Metric",
-    value_name="ECL_TOTAL"
-)
-ecl_total["YEAR"] = ecl_total["Metric"].str.extract(r"Y(\d+)")
-ecl_total.drop(columns="Metric", inplace=True)
-
-# --- 5️⃣ Merge all measures together ---
+# --- 5️⃣ Merge safely using inner joins ---
 merged = (
     ead_ifrs
-    .merge(ecl_ndf, on=dimension_cols + ["YEAR"], how="outer")
-    .merge(ecl_df, on=dimension_cols + ["YEAR"], how="outer")
-    .merge(ecl_total, on=dimension_cols + ["YEAR"], how="outer")
+    .merge(ecl_ndf, on=dimension_cols + ["YEAR"], how="inner")
+    .merge(ecl_df, on=dimension_cols + ["YEAR"], how="inner")
+    .merge(ecl_total, on=dimension_cols + ["YEAR"], how="inner")
 )
 
-# --- 6️⃣ Final clean-up ---
-final_cols = (
-    dimension_cols
-    + ["YEAR", "EAD_IFRS_DF", "ECL_NDF", "ECL_DF", "ECL_TOTAL"]
-)
+# --- 6️⃣ Drop duplicates just in case ---
+merged = merged.drop_duplicates(subset=dimension_cols + ["YEAR"])
+
+# --- 7️⃣ Sort and export ---
+final_cols = dimension_cols + ["YEAR", "EAD_IFRS_DF", "ECL_NDF", "ECL_DF", "ECL_TOTAL"]
 final_df = merged[final_cols].sort_values(by=dimension_cols + ["YEAR"])
 
-# --- 7️⃣ Save reshaped output ---
-final_df.to_excel("reshaped_stress_data.xlsx", index=False)
-print("✅ Reshaping complete — saved as 'reshaped_stress_data.xlsx'")
+final_df.to_excel("reshaped_stress_data_clean.xlsx", index=False)
+print("✅ Clean reshaping done — duplicates removed, saved as 'reshaped_stress_data_clean.xlsx'")
