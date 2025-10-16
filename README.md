@@ -1,46 +1,53 @@
 import pandas as pd
-import re
 
-# --- 1️⃣ Read and clean column names ---
-df = pd.read_excel("stress_data.xlsx", sheet_name="Sheet1")
-df.columns = df.columns.str.strip()  # remove extra spaces
+def handle_new_portfolios(curr_full, mst_trends):
+    """
+    Identify and append new portfolios that exist in current data (curr_full)
+    but are missing in reference MST (mst_trends).
+    """
 
-dimension_cols = [
-    "Scenario", "APPROACH", "ENTITY", "COUNTRY", "PRODUCT", "FIN_BUSINESS_UNIT"
-]
+    # Common dimension keys used to identify unique portfolios
+    dim_cols = ['approach', 'entity', 'country', 'product', 'fin_business_unit']
 
-# --- 2️⃣ Extract all projection years dynamically ---
-years = sorted(set(re.findall(r"Y\d+", " ".join(df.columns))))
+    # Identify new portfolios (present in current but not in MST)
+    mst_keys = mst_trends[dim_cols].drop_duplicates()
+    curr_keys = curr_full[dim_cols].drop_duplicates()
 
-# --- 3️⃣ Define a helper function to melt each metric safely ---
-def melt_metric(df, prefix, new_col):
-    cols = [c for c in df.columns if c.startswith(prefix)]
-    melted = df.melt(id_vars=dimension_cols, value_vars=cols,
-                     var_name="Metric", value_name=new_col)
-    melted["YEAR"] = melted["Metric"].str.extract(r"(Y\d+)")
-    melted.drop(columns="Metric", inplace=True)
-    return melted
+    new_keys = pd.merge(curr_keys, mst_keys, on=dim_cols, how='left', indicator=True)
+    new_keys = new_keys[new_keys['_merge'] == 'left_only'].drop(columns='_merge')
 
-# --- 4️⃣ Melt each measure ---
-ead_ifrs = melt_metric(df, "EAD IFRS DF", "EAD_IFRS_DF")
-ecl_ndf = melt_metric(df, "ECL NDF", "ECL_NDF")
-ecl_df = melt_metric(df, "ECL DF", "ECL_DF")
-ecl_total = melt_metric(df, "ECL ", "ECL_TOTAL")  # note space to avoid ECL DF/NDF confusion
+    if new_keys.empty:
+        print("✅ No new portfolios found.")
+        return mst_trends
 
-# --- 5️⃣ Merge safely using inner joins ---
-merged = (
-    ead_ifrs
-    .merge(ecl_ndf, on=dimension_cols + ["YEAR"], how="inner")
-    .merge(ecl_df, on=dimension_cols + ["YEAR"], how="inner")
-    .merge(ecl_total, on=dimension_cols + ["YEAR"], how="inner")
-)
+    print(f"🆕 Found {len(new_keys)} new portfolios. Creating dummy projection entries...")
 
-# --- 6️⃣ Drop duplicates just in case ---
-merged = merged.drop_duplicates(subset=dimension_cols + ["YEAR"])
+    # Attach dummy Year 0 data (copy from curr_full where available)
+    new_portfolios = pd.merge(curr_full, new_keys, on=dim_cols, how='inner')
+    new_portfolios['new_portfolio'] = 1
 
-# --- 7️⃣ Sort and export ---
-final_cols = dimension_cols + ["YEAR", "EAD_IFRS_DF", "ECL_NDF", "ECL_DF", "ECL_TOTAL"]
-final_df = merged[final_cols].sort_values(by=dimension_cols + ["YEAR"])
+    # Assign projection and scenario combinations (replicates across all MST combos)
+    scenarios = mst_trends['Scenario'].unique()
+    projection_periods = mst_trends['projection_period'].unique()
 
-final_df.to_excel("reshaped_stress_data_clean.xlsx", index=False)
-print("✅ Clean reshaping done — duplicates removed, saved as 'reshaped_stress_data_clean.xlsx'")
+    dummy_entries = []
+    for scn in scenarios:
+        for yr in projection_periods:
+            temp = new_portfolios.copy()
+            temp['Scenario'] = scn
+            temp['projection_period'] = yr
+            dummy_entries.append(temp)
+
+    new_portfolios_expanded = pd.concat(dummy_entries, ignore_index=True)
+
+    # For Y>0, set EAD/ECL same as Y0 or 0 depending on your logic
+    new_portfolios_expanded.loc[
+        new_portfolios_expanded['projection_period'] > 0,
+        ['EAD_IFRS', 'EAD_IFRS_NDF', 'EAD_IFRS_DF', 'ECL', 'ECL_NDF', 'ECL_DF']
+    ] = 0
+
+    # Combine with MST trends
+    combined = pd.concat([mst_trends, new_portfolios_expanded], ignore_index=True)
+
+    print(f"✅ Added {len(new_portfolios_expanded)} dummy rows for new portfolios.")
+    return combined
