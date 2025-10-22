@@ -1,53 +1,49 @@
-import pandas as pd
-
-def handle_new_portfolios(curr_full, mst_trends):
+def fn_pivot_results(df, actuals_year):
     """
-    Identify and append new portfolios that exist in current data (curr_full)
-    but are missing in reference MST (mst_trends).
+    Final Pivoting Function for WRB Scenario Analysis Output
+    --------------------------------------------------------
+    Converts long-format projection data into wide format (year-wise columns)
+    for dashboard or Tableau consumption.
     """
 
-    # Common dimension keys used to identify unique portfolios
-    dim_cols = ['approach', 'entity', 'country', 'product', 'fin_business_unit']
+    df1 = df.copy()
 
-    # Identify new portfolios (present in current but not in MST)
-    mst_keys = mst_trends[dim_cols].drop_duplicates()
-    curr_keys = curr_full[dim_cols].drop_duplicates()
+    # Keep only relevant projection years based on current actuals year
+    if actuals_year == 2024:
+        df1 = df1[df1['projection_period'] <= 26]
+    elif actuals_year == 2025:
+        df1 = df1[df1['projection_period'] <= 25]
 
-    new_keys = pd.merge(curr_keys, mst_keys, on=dim_cols, how='left', indicator=True)
-    new_keys = new_keys[new_keys['_merge'] == 'left_only'].drop(columns='_merge')
+    # Pivot table by scenario, portfolio dimensions, and projection year
+    dim_cols = ['Scenario', 'approach', 'entity', 'country', 'product', 'fin_business_unit']
+    value_cols = ['EAD_IFRS', 'EAD_IFRS_NDF', 'EAD_IFRS_DF', 'ECL', 'ECL_NDF', 'ECL_DF', 'Cumm_LI']
 
-    if new_keys.empty:
-        print("✅ No new portfolios found.")
-        return mst_trends
+    pivoted = (
+        df1
+        .pivot_table(index=dim_cols, columns='projection_period', values=value_cols)
+        .reset_index()
+    )
 
-    print(f"🆕 Found {len(new_keys)} new portfolios. Creating dummy projection entries...")
+    # Flatten MultiIndex columns
+    pivoted.columns = ['_'.join([str(c) for c in col if c]).strip('_') for col in pivoted.columns.values]
 
-    # Attach dummy Year 0 data (copy from curr_full where available)
-    new_portfolios = pd.merge(curr_full, new_keys, on=dim_cols, how='inner')
-    new_portfolios['new_portfolio'] = 1
+    # Create projection year mapping (projection period → calendar year)
+    proj_year_map = {i: actuals_year + i for i in range(df1['projection_period'].max() + 1)}
 
-    # Assign projection and scenario combinations (replicates across all MST combos)
-    scenarios = mst_trends['Scenario'].unique()
-    projection_periods = mst_trends['projection_period'].unique()
+    # Rename columns: e.g., EAD_IFRS_1 → EAD_IFRS_2025
+    new_cols = {}
+    for col in pivoted.columns:
+        for period, year in proj_year_map.items():
+            if col.endswith(f"_{period}"):
+                new_cols[col] = col.replace(f"_{period}", f"_{year}")
+    pivoted.rename(columns=new_cols, inplace=True)
 
-    dummy_entries = []
-    for scn in scenarios:
-        for yr in projection_periods:
-            temp = new_portfolios.copy()
-            temp['Scenario'] = scn
-            temp['projection_period'] = yr
-            dummy_entries.append(temp)
+    # Ensure column order
+    fixed_cols = ['Scenario', 'approach', 'entity', 'country', 'product', 'fin_business_unit']
+    year_cols = sorted([c for c in pivoted.columns if any(str(y) in c for y in proj_year_map.values())])
+    pivoted = pivoted[fixed_cols + year_cols]
 
-    new_portfolios_expanded = pd.concat(dummy_entries, ignore_index=True)
+    print(f"Pivoting complete for actuals_year = {actuals_year}")
+    print(f"Output shape: {pivoted.shape}")
 
-    # For Y>0, set EAD/ECL same as Y0 or 0 depending on your logic
-    new_portfolios_expanded.loc[
-        new_portfolios_expanded['projection_period'] > 0,
-        ['EAD_IFRS', 'EAD_IFRS_NDF', 'EAD_IFRS_DF', 'ECL', 'ECL_NDF', 'ECL_DF']
-    ] = 0
-
-    # Combine with MST trends
-    combined = pd.concat([mst_trends, new_portfolios_expanded], ignore_index=True)
-
-    print(f"✅ Added {len(new_portfolios_expanded)} dummy rows for new portfolios.")
-    return combined
+    return pivoted
