@@ -1,15 +1,15 @@
-I’ll just quickly walk you through the ICAAP Climate Risk Pillar 2A add-on.
+Let me walk you through the ICAAP Climate Risk Pillar 2A capital add-on assessment.
 
-So this builds on the stranded asset work we did as part of Climate MST 2024, specifically for the mortgages portfolio. The idea here is to check whether there are any additional climate-related physical risks that are not fully captured in the macro stress testing.
+This analysis builds on the stranded asset methodology developed as part of Climate MST 2024, focusing specifically on the mortgages portfolio. The objective is to assess whether additional capital is required for climate-related physical risks that may not be fully captured in the macroeconomic stress testing framework.
 
-Now, since Pillar 2A is a one-year capital view, we focus only on acute risks like flooding and cyclones. But at the same time, climate risk is inherently long-term, so what we do is first estimate the total losses up to 2050 using external hazard data from Munich Re under an RCP 8.5 scenario.
+Given the one-year horizon of Pillar 2A, we focus on acute physical risks such as flooding and cyclones. However, since climate risk materialises over longer horizons, we first estimate total losses up to 2050 using external hazard data from Munich Re under the RCP 8.5 scenario.
 
-Then, to bring that into a 1-year view, we use the trajectory of four key climate variables — mainly extreme rainfall, river discharge, cyclones, and CO2 as an overall proxy. In simple terms, we look at how much these variables increase between 2025 and 2026 relative to the total increase up to 2050, and use that proportion to scale down the 2050 losses to a 1-year impact.
+We then translate these long-term losses into a 1-year impact using the trajectory of four key climate variables — extreme rainfall, river discharge, tropical cyclones, and CO2 as a proxy for overall climate severity. Specifically, we look at the incremental change in these variables between 2025 and 2026 relative to the total change up to 2050, and apply that proportion to the 2050 loss to estimate the Year-1 impact.
 
-We do this across all variables and geographies, and take a conservative approach by selecting the maximum impact at the country level.
+This process is repeated across all variables and geographies, and we take a conservative approach by selecting the maximum impact at the country level.
 
-At an overall level, the total stranded asset loss comes to around USD 1.6 billion by 2050. Once we factor in insurance benefits, especially in markets where coverage is mandatory, the final Pillar 2A add-on is about USD 40 million at the group level.
+At an aggregate level, total stranded asset losses are estimated at around USD 1.6 billion by 2050. After incorporating insurance benefits, particularly in markets with mandatory coverage, the resulting Pillar 2A capital add-on is approximately USD 40 million at the group level.
 
-Just to call out a couple of limitations — the analysis is currently limited to mortgages, and there may be some overlap with macro stress losses which we can’t fully isolate. Also, we are assuming a proportional relationship between changes in climate variables and losses, which may not fully capture non-linear or extreme events.
+There are a few important limitations to highlight. The analysis currently covers only the mortgages portfolio, and there may be some overlap with losses already captured in macroeconomic stress testing, which we are unable to fully isolate. Additionally, the approach assumes a proportional relationship between changes in climate variables and losses, which may not fully capture non-linear or extreme tail events.
 
-But overall, this gives us a structured and fairly conservative way to bring climate risk into the ICAAP framework.
+Overall, while the near-term capital impact is relatively moderate, the methodology provides a structured and conservative way to capture emerging climate risks within the ICAAP framework.
