@@ -1,67 +1,15 @@
-import pandas as pd
-import ipywidgets as widgets
-from IPython.display import display, clear_output
+I’ll just quickly walk you through the ICAAP Climate Risk Pillar 2A add-on.
 
-# Load data
-excel_file = 'path/to/your/excel_file.xlsx'
-df = pd.read_excel(excel_file, sheet_name='Sheet1')
+So this builds on the stranded asset work we did as part of Climate MST 2024, specifically for the mortgages portfolio. The idea here is to check whether there are any additional climate-related physical risks that are not fully captured in the macro stress testing.
 
-# Unique values for filters
-countries = ['All'] + df['Country'].unique().tolist()
-portfolios = ['All'] + df['Portfolio'].unique().tolist()
+Now, since Pillar 2A is a one-year capital view, we focus only on acute risks like flooding and cyclones. But at the same time, climate risk is inherently long-term, so what we do is first estimate the total losses up to 2050 using external hazard data from Munich Re under an RCP 8.5 scenario.
 
-def create_filter_widgets():
-    country_dropdown = widgets.Dropdown(
-        options=countries,
-        value='All',
-        description='Country:'
-    )
+Then, to bring that into a 1-year view, we use the trajectory of four key climate variables — mainly extreme rainfall, river discharge, cyclones, and CO2 as an overall proxy. In simple terms, we look at how much these variables increase between 2025 and 2026 relative to the total increase up to 2050, and use that proportion to scale down the 2050 losses to a 1-year impact.
 
-    portfolio_dropdown = widgets.Dropdown(
-        options=portfolios,
-        value='All',
-        description='Portfolio:'
-    )
-    
-    return country_dropdown, portfolio_dropdown
+We do this across all variables and geographies, and take a conservative approach by selecting the maximum impact at the country level.
 
-# Initialize the form
-filters = []
-add_button = widgets.Button(
-    description='Add Filter',
-    button_style='success'
-)
-submit_button = widgets.Button(
-    description='Filter Data',
-    button_style='primary'
-)
-output = widgets.Output()
+At an overall level, the total stranded asset loss comes to around USD 1.6 billion by 2050. Once we factor in insurance benefits, especially in markets where coverage is mandatory, the final Pillar 2A add-on is about USD 40 million at the group level.
 
-def add_filter(_):
-    country_dropdown, portfolio_dropdown = create_filter_widgets()
-    filters.append((country_dropdown, portfolio_dropdown))
-    filter_box.children += (widgets.HBox([country_dropdown, portfolio_dropdown]),)
+Just to call out a couple of limitations — the analysis is currently limited to mortgages, and there may be some overlap with macro stress losses which we can’t fully isolate. Also, we are assuming a proportional relationship between changes in climate variables and losses, which may not fully capture non-linear or extreme events.
 
-def filter_data(_):
-    filtered_data = df.copy()
-    for country_dropdown, portfolio_dropdown in filters:
-        selected_country = country_dropdown.value
-        selected_portfolio = portfolio_dropdown.value
-        if selected_country != 'All':
-            filtered_data = filtered_data[filtered_data['Country'] == selected_country]
-        if selected_portfolio != 'All':
-            filtered_data = filtered_data[filtered_data['Portfolio'] == selected_portfolio]
-    
-    with output:
-        clear_output(wait=True)
-        display(filtered_data)
-
-add_button.on_click(add_filter)
-submit_button.on_click(filter_data)
-
-filter_box = widgets.VBox()
-initial_country_dropdown, initial_portfolio_dropdown = create_filter_widgets()
-filters.append((initial_country_dropdown, initial_portfolio_dropdown))
-filter_box.children = [widgets.HBox([initial_country_dropdown, initial_portfolio_dropdown])]
-
-display(add_button, filter_box, submit_button, output)
+But overall, this gives us a structured and fairly conservative way to bring climate risk into the ICAAP framework.
