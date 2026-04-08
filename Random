@@ -1,15 +1,13 @@
-Let me walk you through the ICAAP Climate Risk Pillar 2A capital add-on assessment.
+So on, as we discussed that standard asset is a combination of both acute and chronic risks. So, what we are doing, is we are just using the acute risks acute risk profile. 2026. The reason why we look at acute risk is because icap is relatively short-term assessment and chronic risk is believed.
 
-This analysis builds on the stranded asset methodology developed as part of Climate MST 2024, focusing specifically on the mortgages portfolio. The objective is to assess whether additional capital is required for climate-related physical risks that may not be fully captured in the macroeconomic stress testing framework.
+25:23
+The Tu pleoto ver, a longartan. I cap. We've used acute risks. This particular case, we will shut down all the markets, and for each Market, we've looked at the profile of four different climate variables. Okay, looked at their trajectory. And write to SS. Deterioration in year 1 when compared to the deterioration by 2050.
 
-Given the one-year horizon of Pillar 2A, we focus on acute physical risks such as flooding and cyclones. However, since climate risk materialises over longer horizons, we first estimate total losses up to 2050 using external hazard data from Munich Re under the RCP 8.5 scenario.
+25:49
+So, in this particular case, which is Hong Kong and extreme rainfall, it turns out that that that iteration is 2.2 percent, so this 2.2 percent is applied on the acute risk of Hong Kong, which is for 64 million. End up at 10 million, so this 10 million is what you see here.
 
-We then translate these long-term losses into a 1-year impact using the trajectory of four key climate variables — extreme rainfall, river discharge, tropical cyclones, and CO2 as a proxy for overall climate severity. Specifically, we look at the incremental change in these variables between 2025 and 2026 relative to the total change up to 2050, and apply that proportion to the 2050 loss to estimate the Year-1 impact.
+26:09
+Quesades besicle is a way to convert 2050 laws to year 1 loss. Now, this is done for all the four different climate variables fact that we have considered, and we've taken a Max of them. Is done for online markets. Wherever they'll be Land of pack 196 million, and wherever there is insurance coverage, we've taken benefit 90 benefit, and we ultimately lined up with 39 million for group and 12 million for solo.
 
-This process is repeated across all variables and geographies, and we take a conservative approach by selecting the maximum impact at the country level.
-
-At an aggregate level, total stranded asset losses are estimated at around USD 1.6 billion by 2050. After incorporating insurance benefits, particularly in markets with mandatory coverage, the resulting Pillar 2A capital add-on is approximately USD 40 million at the group level.
-
-There are a few important limitations to highlight. The analysis currently covers only the mortgages portfolio, and there may be some overlap with losses already captured in macroeconomic stress testing, which we are unable to fully isolate. Additionally, the approach assumes a proportional relationship between changes in climate variables and losses, which may not fully capture non-linear or extreme tail events.
-
-Overall, while the near-term capital impact is relatively moderate, the methodology provides a structured and conservative way to capture emerging climate risks within the ICAAP framework.
+26:41
+And why do this methodology is the same that we did last year and submitted to PRA, and it was well received as well with no fee pass raised by people rails?
