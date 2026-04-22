@@ -1,79 +1,191 @@
-Perfect — adding a numerical example into the same visual slide will make it very powerful. Here’s a final, presentation-ready slide with both flow + numbers 👇
-🎨 📊 FINAL VISUAL SLIDE (WITH EXAMPLE)
-🏷️ Title
-Evolution of Stranded Asset Methodology: Static → Dynamic Framework
-🔷 LEFT: Last Year (Static Balance Sheet) 🔴
-Plain text
-[ Portfolio 2025: 1000 ]
-          │
-          ▼
-[ Portfolio 2050: 1000 ]
-(No change)
-          │
-          ▼
+[ Portfolio 2025 ]
+        │
+        ▼
+[ Same Portfolio in 2050 ]
+        │
+        ▼
 [ Apply Climate Stress ]
-(Assume 20% high-risk)
-          │
-          ▼
-[ Loss = 100 ]
-(1000 × 20% × 50%)
-🔻 Key Points:
+        │
+        ▼
+[ Stranded Asset Loss ]
+
 No growth
 No zoning
-Based on today’s portfolio
-🔷 RIGHT: This Year (Dynamic Balance Sheet) 🟢
-Plain text
-[ Portfolio 2025: 1000 ]
-          │
-          ▼
-[ Growth till 2030 → 1050 ]
-          │
-          ▼
-[ Zoning Applied ]
-(No new flood-risk lending)
-          │
-          ▼
-[ Portfolio 2050 → 900 ]
-(Flood loans phased out)
-          │
-          ▼
-[ 2050 Loss = 157.5 ]
-(900 × 35% × 50%)
-          │
-          ▼
-[ Climate Phasing ]
-          │
-   ┌───────────────┬───────────────┬───────────────┐
-   ▼               ▼               ▼
-[2030: 134]   [2040: 146]   [2050: 157.5]
-🔁 CENTER MESSAGE (BIG ARROW BETWEEN BOTH)
-➡️ “Shift from Static Snapshot → Forward-Looking Portfolio”
-📊 BOTTOM COMPARISON (WITH NUMBERS)
+Based on current exposure
+Static view of risk
 
-Static
-Dynamic
-Portfolio (2050)
-1000
-900
+
+[ Portfolio 2025 ]
+        │
+        ▼
+[ Growth till 2030 ]
+        │
+        ▼
+[ Zoning Applied ]
+(No new risky lending)
+        │
+        ▼
+[ Evolving Portfolio (2050) ]
+        │
+        ▼
+[ 2050 Loss Calculation ]
+        │
+        ▼
+[ Climate Variable Phasing ]
+        │
+        ▼
+[ Loss: 2030 / 2040 / 2050 ]
+
+
+Static Approach
+Dynamic Approach
+Portfolio
+Fixed
+Evolves
 Growth
-❌
-✅ (till 2030)
+❌ Ignored
+✅ Included
 Zoning
-❌
-✅
-Loss
-100
-157.5
-Time Profile
-Single point
-2030 / 2040 / 2050
-💡 BOTTOM INSIGHT BOX (VERY IMPORTANT)
-🟦
-“Loss increases in the dynamic approach because it reflects future risk build-up across all hazards, while removing only specific risks (e.g., flood) through zoning.”
-🎤 WHAT YOU SAY (SCRIPT)
-“On the left, we assumed a fixed portfolio and calculated loss directly on today’s exposure, resulting in a loss of 100. On the right, we allow the portfolio to grow and evolve, embed zoning policies which phase out flood risk, and then calculate loss on the future portfolio. This results in a higher but more realistic loss of 157.5, which is then distributed across time using climate variables.”
-🚀 OPTIONAL (if you want to impress more)
-Add one line verbally:
-“The increase is not due to model conservatism, but because we are now capturing risks that emerge in the future portfolio rather than limiting ourselves to today’s exposure.”
-If you want next, I can: ✅ Turn this into a downloadable PPT (proper shapes, arrows, icons)
-✅ Or make a waterfall chart showing why loss increased from 100 → 157.5 (very impressive)
+❌ Not included
+✅ Embedded
+Risk Basis
+Today
+Future
+Climate
+Static
+Time-phased
+
+
+Perfect — here is a complete flow-chart style representation of both Part 1 (Static) and Part 2 (Dynamic) with all steps, numbers, and logic included. You can copy this directly into PPT using boxes and arrows.
+🔴 FLOW CHART – PART 1 (LAST YEAR: STATIC APPROACH)
+Plain text
+[Start: Portfolio 2025]
+Total = 1000
+        │
+        ▼
+[Assumption: No Change Till 2050]
+Portfolio remains = 1000
+(No growth, no policy, no composition change)
+        │
+        ▼
+[Apply Climate Stress (Static)]
+Assume:
+- 20% becomes high-risk
+- Loss severity = 50%
+        │
+        ▼
+[Calculate High-Risk Exposure]
+= 1000 × 20% = 200
+        │
+        ▼
+[Calculate Loss]
+= 200 × 50% = 100
+        │
+        ▼
+[Final Output]
+2050 Loss = 100
+(No intermediate years)
+🔻 Key Characteristics (put beside flow)
+Portfolio frozen in time
+Based on today’s exposure
+No growth, no zoning
+Single-point loss (2050 only)
+🟢 FLOW CHART – PART 2 (THIS YEAR: DYNAMIC APPROACH)
+Plain text
+[Start: Portfolio 2025]
+Flood-risk (Korea) = 200
+Other loans = 800
+Total = 1000
+        │
+        ▼
+[Step 1: Growth till 2030]
+Total grows by 5%
+→ 1000 × 1.05 = 1050
+        │
+        ▼
+[Step 2: Apply Zoning Policy]
+Korea flood:
+- No new lending in high-risk zones
+
+Effect:
+- Flood loans reduce: 200 → 150
+- Other loans grow: 800 → 900
+        │
+        ▼
+[Portfolio in 2030]
+Flood = 150
+Other = 900
+Total = 1050
+        │
+        ▼
+[Step 3: Project Portfolio to 2050]
+
+Flood loans (run-off):
+2025: 200 → 2030: 150 → 2040: 75 → 2050: 0
+
+Other loans:
+2025: 800 → 2030: 900 → 2040: 900 → 2050: 900
+
+Total:
+2030: 1050 → 2040: 975 → 2050: 900
+        │
+        ▼
+[Step 4: Calculate 2050 Loss (BASE)]
+
+Assume:
+- 35% becomes high-risk (all hazards)
+- Loss severity = 50%
+
+High-risk exposure:
+= 900 × 35% = 315
+
+Loss:
+= 315 × 50% = 157.5
+        │
+        ▼
+[Step 5: Climate Variable Phasing]
+
+Using 4 variables (flood, heat, storm, drought)
+
+Weights:
+2030 = 85%
+2040 = 93%
+2050 = 100%
+        │
+        ▼
+[Step 6: Calculate Phased Losses]
+
+2030 = 157.5 × 85% = 134
+2040 = 157.5 × 93% = 146
+2050 = 157.5
+        │
+        ▼
+[Final Output]
+
+2030 Loss = 134
+2040 Loss = 146
+2050 Loss = 157.5
+🔵 IMPORTANT NOTE (Put as separate box in slide)
+Plain text
+Zoning impact is NOT applied as a subtraction.
+
+It is already embedded because:
+- No new flood-risk loans are added
+- Existing flood loans reduce over time
+🔁 BIG TRANSFORMATION ARROW (Between both flows)
+➡️
+Static (Fixed Portfolio)
+→
+Dynamic (Evolving Portfolio + Policy + Climate Timing)
+🎯 FINAL TAKEAWAY (Bottom of Slide)
+Plain text
+Static approach = Loss based on today’s portfolio
+
+Dynamic approach = Loss based on future portfolio
+                   shaped by growth, zoning, and climate evolution
+🎤 What you say while showing this
+“On the left, we assumed no change in the portfolio and calculated loss directly, resulting in 100. On the right, we now allow the portfolio to grow, embed zoning policies which remove flood risk over time, and calculate loss based on the future portfolio. This gives a more realistic loss of 157.5, which we then distribute across time using climate variables.”
+🚀 If you want next level
+I can: ✅ Convert this into a proper PPT flowchart (boxes, arrows, colors)
+✅ Or make a visual infographic version (consulting style)
+✅ Or create a waterfall showing 100 → 157.5 drivers (very powerful)
