@@ -1,138 +1,110 @@
-
+Perfect — this is exactly the kind of “before vs after” story senior stakeholders love. I’ll give you:
+🧠 Clear comparison (simple language)
+🎯 Key messages (what to say)
+📊 Ready-to-use slide content (McKinsey style)
+🧠 1. Core Difference (In One Line)
+Last Year: Portfolio frozen → risk unrealistic
+This Year: Portfolio evolves → risk realistic
+🔍 2. Side-by-Side Comparison
+🔴 Last Year: Static Balance Sheet
+How it worked:
+Portfolio in 2050 = same as today (1000)
+No growth, no change in composition
+Loss calculation:
+Plain text
+2050 loss = based on today’s portfolio only
+Zoning:
+Applied as post-adjustment (subtraction)
+👉 Example:
+Plain text
+Loss = 100 – 20 = 80
+❌ Problems:
+Unrealistic → ignores growth
+Anchored to today’s risky loans
+Zoning applied artificially
+Double counting risk possible
+🟢 This Year: Dynamic Balance Sheet
+How it works:
+Portfolio grows till 2030 → then stabilizes
+Composition changes over time
+👉 Example:
+Plain text
+1000 → 1050 (2030) → evolves to 900 (2050)
+Zoning:
+Applied at origination
+No new risky loans added
+Existing risky loans reduce naturally
+Loss calculation:
+Plain text
+Step 1: Build future portfolio  
+Step 2: Calculate 2050 loss on that portfolio  
+Step 3: Phase losses backward (climate variables)
+✔️ Benefits:
+Realistic portfolio evolution
+No artificial adjustments
+No double counting
+Better alignment with ICAAP
+🔥 3. Visual Comparison (Use this in slide)
+OLD vs NEW FLOW
+Plain text
+OLD (Static)
 Portfolio (2025)
-      ↓
-Same portfolio assumed till 2050
-      ↓
-Apply GMT-based phasing
-      ↓
-Apply zoning as overlay (reduction)
-      ↓
+   ↓
+Same Portfolio (2050)
+   ↓
+Loss Calculation
+   ↓
+(- Zoning Adjustment)
+   ↓
 Final Loss
-
-Key Characteristics:
-Portfolio does not change over time
-Same risky loans assumed till 2050
-Zoning applied as post-adjustment
-Climate represented via GMT (indirect)
-
-
-Portfolio (2025)
-      ↓
-Growth till 2030 + Zoning-adjusted lending
-      ↓
-Projected Portfolio (2050)
-      ↓
-Compute 2050 Loss (all hazards)
-      ↓
-Phase losses using 4 climate variables
-      ↓
-Final Loss (2030 / 2040 / 2050)
-
-Key Characteristics:
-Portfolio evolves over time
-No new lending in restricted zones
-Zoning embedded in portfolio evolution
-Climate captured via 4 hazard variables
-
-
-
-Great — this is exactly the kind of “before vs after” story that lands well with senior stakeholders.
-I’ll give you a clean comparison + slide-ready content (McKinsey style) that you can directly copy into PPT.
-🧠 🎯 Core Message of the Slide
-We are moving from a simplistic static assumption to a realistic, policy-aligned dynamic framework
-📊 SLIDE TITLE
-From Static to Dynamic Balance Sheet: Enhancing Realism in Stranded Asset Assessment
-🔷 1. Main Visual (Side-by-Side Comparison)
-LEFT SIDE — ❌ Previous Approach (Static)
 Plain text
+NEW (Dynamic)
 Portfolio (2025)
-      ↓
-Same portfolio assumed till 2050
-      ↓
-Apply GMT-based phasing
-      ↓
-Apply zoning as overlay (reduction)
-      ↓
+   ↓
+Growth + Zoning (till 2030)
+   ↓
+Evolving Portfolio (2050)
+   ↓
+2050 Loss Calculation
+   ↓
+Climate Phasing
+   ↓
 Final Loss
-Key Characteristics:
-Portfolio does not change over time
-Same risky loans assumed till 2050
-Zoning applied as post-adjustment
-Climate represented via GMT (indirect)
-RIGHT SIDE — ✅ New Approach (Dynamic)
-Plain text
-Portfolio (2025)
-      ↓
-Growth till 2030 + Zoning-adjusted lending
-      ↓
-Projected Portfolio (2050)
-      ↓
-Compute 2050 Loss (all hazards)
-      ↓
-Phase losses using 4 climate variables
-      ↓
-Final Loss (2030 / 2040 / 2050)
-Key Characteristics:
-Portfolio evolves over time
-No new lending in restricted zones
-Zoning embedded in portfolio evolution
-Climate captured via 4 hazard variables
-🔷 2. Key Differences Table (VERY IMPORTANT)
-Dimension
-Static Approach ❌
-Dynamic Approach ✅
-Portfolio
-Constant till 2050
-Grows till 2030, then stabilizes
-Risk Source
-Based on current exposures
-Based on future portfolio
-Zoning
-Applied as reduction
-Embedded in lending decisions
-Climate Driver
-GMT
-4 hazard variables
-Loss Timing
-Derived indirectly
-Explicit phasing
-Realism
-Low
-High
-🔷 3. Simple Numeric Illustration (Powerful)
-Static Approach:
-Plain text
-Base Loss = 100  
-– Zoning adjustment = 20  
-= Final Loss = 80
-Dynamic Approach:
-Plain text
-2050 Loss (future portfolio) = 157  
-→ Phased using climate variables  
-
-2030 = 134  
-2040 = 146  
-2050 = 157
-👉 No artificial subtraction — zoning already reflected
-🔷 4. Key Takeaways (Bottom of Slide)
-Removes unrealistic assumption of constant portfolio
-Avoids double counting of zoning impacts
-Aligns with real-world lending practices
-Improves interpretability and auditability
-Better reflects multi-hazard climate risk
-🎤 20-sec Talk Track (Use this while presenting)
-“Earlier, we assumed the portfolio remains unchanged till 2050 and applied zoning as a post-adjustment. In the revised approach, we allow the portfolio to evolve with growth and embed zoning directly into lending decisions. We then calculate losses based on the future portfolio and distribute them across time using climate variables, making the methodology more realistic and robust.”
-🎨 Design Tips (to make it look premium)
-Use:
-❌ Red (Static)
-✅ Green (Dynamic)
-Add icons:
-📦 Portfolio
-📈 Growth
-🌍 Climate
-🏛️ Policy
-Keep arrows horizontal (clean consulting look)
+🎯 4. Key Messages (Put in slide bottom)
+🔑 Message 1:
+Moves from static snapshot → forward-looking portfolio
+🔑 Message 2:
+Zoning embedded in lending behavior, not post-adjustment
+🔑 Message 3:
+Loss driven by future exposure, not current exposure
+🔑 Message 4:
+Improves model realism and regulatory alignment
+📊 5. Slide (READY TO COPY)
+Title:
+Enhancement in Stranded Asset Methodology: Static vs Dynamic Balance Sheet
+Left Side: Previous Approach (Static)
+Portfolio assumed constant till 2050
+Loss based on current exposure
+Zoning applied as overlay
+No evolution in portfolio composition
+👉 Limitation:
+May over/underestimate risk
+Not aligned with real lending behavior
+Right Side: Revised Approach (Dynamic)
+Portfolio grows till 2030, then stabilizes
+Zoning embedded in origination (no new risky lending)
+Portfolio composition evolves over time
+Loss calculated on future portfolio
+Climate variables used for phasing
+👉 Benefit:
+More realistic
+No double counting
+Better risk representation
+Bottom Banner (Important)
+“The revised approach shifts from a static, backward-looking view to a dynamic, forward-looking assessment of stranded asset risk.”
+🎤 6. 20-sec Script (Say this)
+“Earlier, we assumed the portfolio remains constant till 2050 and applied zoning as a post-adjustment. In the revised approach, we allow the portfolio to evolve with growth and embed zoning directly into lending behavior. This ensures that losses are calculated on a realistic future portfolio and distributed over time using climate variables.”
 🚀 If you want next level
-I can: ✅ Create an actual PPT/Google Slide (downloadable)
-✅ Convert this into a waterfall visual (like your manager suggested)
-✅ Or help you build 1-slide + appendix backup (for tough questions)
+I can: ✅ Turn this into actual PPT (with icons + waterfall visual)
+✅ Or create a very sharp visual (consulting-grade slide with colors & layout)
+✅ Or align wording with HSBC / SCB style decks
